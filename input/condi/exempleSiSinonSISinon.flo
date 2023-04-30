@@ -1,0 +1,7 @@
+si(n<1){
+    ecrire(a);
+} sinon si (n<1) {
+    ecrire(b);
+} sinon {
+    ecrire(c);
+}
