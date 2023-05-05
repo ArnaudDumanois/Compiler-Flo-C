@@ -1,0 +1,4 @@
+tantque(a<100){
+	ecrire(a % 100);
+}
+ecrire(a);

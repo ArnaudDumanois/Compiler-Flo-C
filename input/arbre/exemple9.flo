@@ -1,0 +1,6 @@
+entier a;
+a = 1;
+booleen b;
+b = Vrai;
+ecrire(non a et b);
+ecrire(non (a et b));

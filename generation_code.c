@@ -8,6 +8,8 @@
 #define printifm(format, ...) if(afficher_nasm){ printf(format, __VA_ARGS__); }
 
 int afficher_nasm = 1;
+int label_count = 0;
+int fin_si_count = 0;
 
 /* fonction locale, permet d'afficher un commentaire */
 void nasm_comment(char *comment) {
@@ -59,12 +61,89 @@ void nasm_liste_instructions(n_l_instructions *n) {
 	} while(n != NULL );
 }
 
-void nasm_instruction(n_instruction* n){
-	if(n->type_instruction == i_ecrire){
-		nasm_exp(n->u.exp);
-		nasm_commande("pop", "eax", NULL, NULL, NULL); //on dépile la valeur d'expression sur eax
-		nasm_commande("call", "iprintLF", NULL, NULL, NULL); //on envoie la valeur d'eax sur la sortie standard
-	}
+void nasm_instruction(n_instruction* n) {
+    if (n->type_instruction == i_ecrire) {
+        nasm_exp(n->u.exp);
+        nasm_commande("pop", "eax", NULL, NULL, NULL); //on dépile la valeur d'expression sur eax
+        nasm_commande("call", "iprintLF", NULL, NULL, NULL); //on envoie la valeur d'eax sur la sortie standard
+    } else if (n->type_instruction == i_declaration) {
+        if (n->u.declaration->t_type == t_entier) {
+            nasm_commande("sub", "esp", "4", NULL, NULL);
+            nasm_commande("mov", "dword [esp]", "0", NULL, NULL);
+        } else if (n->u.declaration->t_type == t_booleen) {
+            nasm_commande("sub", "esp", "4", NULL, NULL);
+            nasm_commande("mov", "dword [esp]", "0", NULL, NULL);
+        }
+    } else if (n->type_instruction == i_affectation) {
+        if (n->u.affectation->variable->t_type == t_entier) {
+            nasm_exp(n->u.affectation->exp);
+            nasm_commande("pop", "eax", NULL, NULL, NULL);
+            nasm_commande("mov", "dword [esp]", "eax", NULL, NULL);
+        } else if (n->u.affectation->variable->t_type == t_booleen) {
+            nasm_exp(n->u.affectation->exp);
+            nasm_commande("pop", "eax", NULL, NULL, NULL);
+            nasm_commande("mov", "dword [esp]", "eax", NULL, NULL);
+        }
+    } else if (n->type_instruction == i_conditionnelle) {
+        nasm_exp(n->u.conditionnelle->condition);
+        nasm_commande("pop", "eax", NULL, NULL, NULL);
+        nasm_commande("cmp", "eax", "1", NULL, " on verifie la condition");
+        // on crée les labels pour le si et le sinon et la fin
+        char label_if[10];
+        sprintf(label_if, "if%d", label_count);
+        char label_else[10];
+        sprintf(label_else, "else%d", label_count);
+        char label_elif[10];
+        sprintf(label_elif, "elif%d", label_count);
+        char label_endif[10];
+        sprintf(label_endif, "endif%d", fin_si_count);
+
+        if (n->u.conditionnelle->liste_sinon_si != NULL) {
+            nasm_commande("je", label_if, NULL, NULL, "on saute au si");
+            nasm_commande("jmp", label_endif, NULL, NULL, "on saute au prochain endif");
+            sprintf(label_if, "if%d:", label_count);
+            nasm_commande(label_if, NULL, NULL, NULL, "on entre dans le si");
+            nasm_liste_instructions(n->u.conditionnelle->instructions_si);
+            sprintf(label_else, "else");
+            nasm_commande("jmp", label_else, NULL, NULL, "on saute au sinon");
+            sprintf(label_endif, "endif%d:", label_count);
+            nasm_commande(label_endif, NULL, NULL, NULL, "on entre dans le endif");
+            //sprintf(label_else, "else%d:", label_count);
+            //nasm_commande(label_else, NULL, NULL, NULL, " on entre dans le sinon");
+            label_count++;
+            fin_si_count++;
+            nasm_instruction(n->u.conditionnelle->liste_sinon_si);
+            //fin_si_count++;
+            sprintf(label_else, "else:");
+            nasm_commande(label_else, NULL, NULL, NULL, " on entre dans le sinon");
+            /*if (n->u.conditionnelle->liste_sinon != NULL) {
+                nasm_commande(label_else, NULL, NULL, NULL, " on entre dans le sinon");
+                nasm_liste_instructions(n->u.conditionnelle->liste_sinon);
+            }
+            */
+
+            //sprintf(label_endif, "endif%d:", fin_si_count);
+            //nasm_commande(label_endif, NULL, NULL, NULL, "on saute à la fin");
+        } else if (n->u.conditionnelle->liste_sinon != NULL) {
+            nasm_commande("je", label_if, NULL, NULL, "on saute au si");
+            nasm_commande("jmp", label_else, NULL, NULL, "on saute au sinon");
+            sprintf(label_if, "if%d:", label_count);
+            nasm_commande(label_if, NULL, NULL, NULL, "on entre dans le si");
+            nasm_liste_instructions(n->u.conditionnelle->instructions_si);
+            nasm_commande("jmp", label_endif, NULL, NULL, "on saute à la fin");
+            sprintf(label_else, "else%d:", label_count);
+            nasm_commande(label_else, NULL, NULL, NULL, " on entre dans le sinon");
+            nasm_liste_instructions(n->u.conditionnelle->liste_sinon);
+        } else {
+            nasm_commande("je", label_if, NULL, NULL, "on saute au si");
+            nasm_commande("jmp", label_endif, NULL, NULL, "on saute à la fin");
+            sprintf(label_if, "if%d:", label_count);
+            nasm_commande(label_if, NULL, NULL, NULL, "on entre dans le si");
+            nasm_liste_instructions(n->u.conditionnelle->instructions_si);
+            sprintf(label_endif, "endif%d:", fin_si_count);
+            nasm_commande(label_endif, NULL, NULL, NULL, "on saute à la fin");
+        }
+    }
 }
 
 void nasm_exp(n_exp* n){
@@ -75,6 +154,7 @@ void nasm_exp(n_exp* n){
         sprintf(buffer, "%d", n->u.valeur);
         nasm_commande("push", buffer, NULL, NULL, NULL) ;
 	}
+
 }
 
 void nasm_operation(n_operation* n){

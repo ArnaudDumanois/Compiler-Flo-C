@@ -1,0 +1,12 @@
+ecrire(42);
+entier a;
+a = 12;
+ecrire(a);
+entier b;
+c = 13;
+ecrire(c);
+
+
+
+
+

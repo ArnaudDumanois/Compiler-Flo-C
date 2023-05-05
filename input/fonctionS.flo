@@ -1,5 +1,0 @@
-entier max(entier b, entier c) {
-    ecrire(a);
-}
-
-ecrire(b);

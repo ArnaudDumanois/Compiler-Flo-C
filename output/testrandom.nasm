@@ -7,23 +7,22 @@ section	.text
 	global _start
 _start:
 	push	1
-	push	1
+	push	2
 	pop	ebx		 ; depile la seconde operande dans ebx
 	pop	eax		 ; depile la permière operande dans eax
-	add	eax, ebx		 ; effectue l'opération
+	cmp	eax, ebx		 ; compare les deux opérandes
+	setl	al		 ; met 1 dans al si eax < ebx
+	movzx	eax, al		 ; met 0 ou 1 dans eax
 	push	eax		 ; empile le résultat
 	pop	eax
 	call	iprintLF
 	push	1
-	push	1
-	push	1
+	push	2
 	pop	ebx		 ; depile la seconde operande dans ebx
 	pop	eax		 ; depile la permière operande dans eax
-	add	eax, ebx		 ; effectue l'opération
-	push	eax		 ; empile le résultat
-	pop	ebx		 ; depile la seconde operande dans ebx
-	pop	eax		 ; depile la permière operande dans eax
-	add	eax, ebx		 ; effectue l'opération
+	cmp	eax, ebx		 ; compare les deux opérandes
+	setg	al		 ; met 1 dans al si eax > ebx
+	movzx	eax, al		 ; met 0 ou 1 dans eax
 	push	eax		 ; empile le résultat
 	pop	eax
 	call	iprintLF

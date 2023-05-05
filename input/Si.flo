@@ -1,0 +1,4 @@
+si(Vrai) {
+    ecrire(1);
+}
+ecrire(0);

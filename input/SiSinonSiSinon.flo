@@ -1,0 +1,10 @@
+si (Faux) {
+    ecrire(0);
+} sinon si (Faux) {
+    ecrire(1);
+} sinon si (Faux){
+    ecrire(2);
+} sinon {
+    ecrire(3);
+}
+ecrire(4);
