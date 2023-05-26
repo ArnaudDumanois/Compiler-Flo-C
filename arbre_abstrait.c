@@ -10,6 +10,7 @@
 */
 
 
+
 //affiche l'entier avec sa valeur après un certain nombres d'espaces et un retour à la ligne
 void afficher(char* s,int indent){
 	for(int i = 0; i < indent; i++){
@@ -611,3 +612,97 @@ n_parametre* creer_n_parametre(type t_type, char* nom){
     return n;
 }
 
+// fonctions pour la table des symboles
+/*
+table_symboles* creer_table_symboles(int taille){
+    table_symboles *table = malloc(sizeof(table_symboles));
+    table->taille = taille;
+    table->table = (symbole**)calloc(taille, sizeof(symbole*));
+    table->precedent = NULL;
+    table->suivant = NULL;
+    return table;
+}
+
+void ajouter_symbole(table_symboles* table, n_variable* variable){
+    int index = hash_code(variable->nom);
+    symbole *symbole = malloc(sizeof(symbole));
+    symbole *ancien_symbole = table->table[index];
+    symbole->nom = variable->nom;
+    symbole->type = variable->t_type;
+    symbole->suivant = ancien_symbole;
+}
+
+symbole* chercher_symbole(table_symboles* table, char* nom){
+    int index = hash_code(nom);
+    while(table->table[index] != NULL){
+        if(strcmp(table->table[index]->nom, nom) == 0){
+            return table->table[index];
+        }
+        index = (index + 1) % table->taille;
+    }
+    return NULL;
+}
+
+int hash_code(char* chaine){
+    int hash = 0;
+    int i;
+    for(i = 0; i < strlen(chaine); i++){
+        hash += (int)chaine[i];
+    }
+    return hash;
+}
+
+void supprimer_table_symboles(table_symboles* table){
+    int i;
+    for(i = 0; i < table->taille; i++){
+        if(table->table[i] != NULL){
+            free(table->table[i]);
+        }
+    }
+    free(table->table);
+    free(table);
+}
+
+void afficher_symboles(symbole* symbole){
+    printf("nom : %s\n", symbole->nom);
+    printf("type : %d\n", symbole->type);
+}
+
+void afficher_table_symboles(table_symboles* table){
+    int i;
+    for(i = 0; i < table->taille; i++){
+        if(table->table[i] != NULL){
+            printf("index : %d\n", i);
+            afficher_symboles(table->table[i]);
+        }
+    }
+}
+
+pile_table_symboles * creer_pile_table_symboles(){
+    pile_table_symboles *pile = malloc(sizeof(pile_table_symboles));
+    pile->taille = 0;
+    pile->base = NULL;
+    pile->sommet = NULL;
+    return pile;
+}
+
+void empiler_table_symboles(pile_table_symboles *pile, table_symboles *table){
+    table->suivant = pile->sommet;
+    pile->sommet = table;
+    if (pile->base == NULL){
+        pile->base = table;
+    }
+    pile->taille++;
+}
+
+void depiler_table_symboles(pile_table_symboles *pile){
+    if (pile->sommet != NULL) {
+        pile->sommet = pile->sommet->suivant;
+    }
+}
+
+void debut_bloc(pile_table_symboles *pile){
+    table_symboles *table = creer_table_symboles(TAILLE_TABLE_SYMBOLES);
+    empiler_table_symboles(pile, table);
+}
+ */

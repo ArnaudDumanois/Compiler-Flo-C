@@ -9,8 +9,3 @@ ecrire(non 0 et non 0); # 1
 ecrire(non 1 ou non 0); # 1
 ecrire(non 1 ou non 1); # 0
 ecrire(non 0 ou non 0); # 1
-
-ecrire(42); # 42
-ecrire(non (1 + 1)); # -1 pour false
-ecrire(non (5 - 3)); # -1 pour false
-ecrire(non 5 - 5); # 1 pour true

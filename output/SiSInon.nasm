@@ -15,6 +15,7 @@ _start:
 	push	1
 	pop	eax
 	call	iprintLF
+	jmp	endif0		 ; on saute à la fin
 	else0:		 ;  on entre dans le sinon
 	push	2
 	pop	eax

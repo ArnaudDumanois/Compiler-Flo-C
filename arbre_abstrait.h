@@ -6,7 +6,7 @@
   * l -> liste
   * exp -> expression (arithmétique)
 */
-
+#define TAILLE_TABLE_SYMBOLES 100
 
 typedef struct n_programme n_programme; /* Noeud du type programme */
 typedef struct n_l_instructions n_l_instructions; /* Noeud du type liste d'instructions */
@@ -29,6 +29,9 @@ typedef struct n_l_fonctions n_l_fonctions; /* Noeud du type liste de fonctions 
 typedef struct n_fonction n_fonction; /* Noeud du type fonction */
 typedef struct n_l_parametres n_l_parametres; /* Noeud du type liste de parametres */
 typedef struct n_parametre n_parametre; /* Noeud du type parametre */
+typedef struct symbole symbole; /* Noeud du type symbole */
+typedef struct table_symboles table_symboles; /* Noeud du type table des symboles */
+typedef struct pile_table_symboles pile_table_symboles; /* Noeud du type pile de tables des symboles */
 
 struct n_programme{   // pour le moment un programme est juste une liste d'instructions. Il faudra ajouter une liste de définitions de fonctions.
 	n_l_instructions* instructions;
@@ -147,6 +150,24 @@ struct n_parametre{
     char* nom;
 };
 
+struct symbole{
+    type type;
+    char* nom;
+};
+
+struct table_symboles{
+    symbole **table;
+    int taille;
+    struct table_symboles* suivant;
+    struct table_symboles* precedent;
+};
+
+struct pile_table_symboles{
+    table_symboles* sommet;
+    table_symboles* base;
+    int taille;
+};
+
 
 void afficher_n_programme(n_programme* prog,int indent);
 void afficher_n_l_instructions(n_l_instructions* instructions ,int indent);
@@ -199,5 +220,23 @@ n_l_fonctions* creer_n_l_fonctions(n_fonction* fonction, n_l_fonctions* suivant)
 n_fonction* creer_n_fonction(type t_type, char* nom, n_l_parametres* parametres, n_l_instructions* instructions);
 n_l_parametres* creer_n_l_parametres(n_parametre* parametre, n_l_parametres* suivant);
 n_parametre* creer_n_parametre(type t_type, char* nom);
+
+/*
+// fonction pour la table de symboles
+table_symboles* creer_table_symboles(int taille);
+void ajouter_symbole(table_symboles* table, n_variable* variable);
+symbole* chercher_symbole(table_symboles* table, char* nom);
+int hash_code(char* nom);
+void supprimer_table_symboles(table_symboles* table);
+
+void afficher_table_symboles(table_symboles* table);
+void afficher_symbole(symbole* symbole);
+
+// fonction pour la pile de table de symboles
+pile_table_symboles* creer_pile_table_symboles();
+void empiler_table_symboles(pile_table_symboles* pile, table_symboles* table);
+void depiler_table_symboles(pile_table_symboles* pile);
+void debut_bloc(pile_table_symboles* pile);
+*/
 
 #endif

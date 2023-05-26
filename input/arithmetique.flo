@@ -96,6 +96,7 @@ ecrire(1 < 2 et 2 < 3); # 1
 ecrire(1 < 2 et 2 > 3); # 0
 ecrire(1 > 2 et 2 < 3); # 0
 ecrire(1 > 2 et 2 > 3); # 0
+
 ecrire(42); # 42
 ecrire(non 1 < 2 et 2 < 3); # 0
 ecrire(non 1 < 2 et 2 > 3); # 0

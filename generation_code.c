@@ -68,22 +68,33 @@ void nasm_instruction(n_instruction* n) {
         nasm_commande("call", "iprintLF", NULL, NULL, NULL); //on envoie la valeur d'eax sur la sortie standard
     } else if (n->type_instruction == i_declaration) {
         if (n->u.declaration->t_type == t_entier) {
-            nasm_commande("sub", "esp", "4", NULL, NULL);
-            nasm_commande("mov", "dword [esp]", "0", NULL, NULL);
+            nasm_commande("sub", "esp", "4", NULL, "on réserve 4 octets pour la variable");
+            nasm_commande("mov", "dword [esp]", "0", NULL, "on initialise la variable à 0");
         } else if (n->u.declaration->t_type == t_booleen) {
-            nasm_commande("sub", "esp", "4", NULL, NULL);
-            nasm_commande("mov", "dword [esp]", "0", NULL, NULL);
+            nasm_commande("sub", "esp", "4", NULL, "on réserve 4 octets pour la variable");
+            nasm_commande("mov", "dword [esp]", "0", NULL, "on initialise la variable à 0");
         }
     } else if (n->type_instruction == i_affectation) {
         if (n->u.affectation->variable->t_type == t_entier) {
             nasm_exp(n->u.affectation->exp);
-            nasm_commande("pop", "eax", NULL, NULL, NULL);
-            nasm_commande("mov", "dword [esp]", "eax", NULL, NULL);
+            nasm_commande("pop", "eax", NULL, NULL, "on dépile la valeur d'expression sur eax");
+            nasm_commande("mov", "dword [esp]", "eax", NULL, "on met la valeur de eax dans la variable");
         } else if (n->u.affectation->variable->t_type == t_booleen) {
             nasm_exp(n->u.affectation->exp);
             nasm_commande("pop", "eax", NULL, NULL, NULL);
             nasm_commande("mov", "dword [esp]", "eax", NULL, NULL);
         }
+    } else if (n->type_instruction == i_decla_aff) {
+        if (n->u.decla_aff->declaration->u.declaration->t_type == t_entier && n->u.decla_aff->affectation->u.affectation->variable->t_type == t_entier) {
+            nasm_instruction(n->u.decla_aff->declaration);
+            nasm_instruction(n->u.decla_aff->affectation);
+        } else if (n->u.decla_aff->declaration->u.declaration->t_type == t_booleen&& n->u.decla_aff->affectation->u.affectation->variable->t_type == t_booleen) {
+            nasm_instruction(n->u.decla_aff->declaration);
+            nasm_instruction(n->u.decla_aff->affectation);
+        }
+
+
+
     } else if (n->type_instruction == i_conditionnelle) {
         nasm_exp(n->u.conditionnelle->condition);
         nasm_commande("pop", "eax", NULL, NULL, NULL);
@@ -143,6 +154,23 @@ void nasm_instruction(n_instruction* n) {
             sprintf(label_endif, "endif%d:", fin_si_count);
             nasm_commande(label_endif, NULL, NULL, NULL, "on saute à la fin");
         }
+    } else if (n->type_instruction == i_boucle_tantque) {
+        char label_while[15];
+        sprintf(label_while, "while%d", label_count);
+        char label_endwhile[15];
+        sprintf(label_endwhile, "endwhile%d", label_count);
+        sprintf(label_while, "while%d:", label_count);
+        nasm_commande(label_while, NULL, NULL, NULL, "on entre dans le while");
+        nasm_exp(n->u.boucle_tantque->condition);
+        nasm_commande("pop", "eax", NULL, NULL, NULL);
+        nasm_commande("cmp", "eax", "0", NULL, " on verifie la condition");
+        nasm_commande("je", label_endwhile, NULL, NULL, "on saute à la fin");
+        nasm_liste_instructions(n->u.boucle_tantque->instructions);
+        sprintf(label_while, "while%d", label_count);
+        nasm_commande("jmp", label_while, NULL, NULL, "on saute au while");
+        sprintf(label_endwhile, "endwhile%d:", label_count);
+        nasm_commande(label_endwhile, NULL, NULL, NULL, "on sort du while");
+        label_count++;
     }
 }
 
@@ -153,8 +181,12 @@ void nasm_exp(n_exp* n){
         char buffer[10];
         sprintf(buffer, "%d", n->u.valeur);
         nasm_commande("push", buffer, NULL, NULL, NULL) ;
-	}
-
+	} else if (n->type_exp == i_lire) {
+        nasm_commande("mov", "eax", "sinput", NULL, "on met l'adresse de sinput dans eax");
+        nasm_commande("call", "readline", NULL, NULL, "on appelle readline");
+        nasm_commande("call", "atoi", NULL, NULL, "on convertit la chaine en entier");
+        nasm_commande("push", "eax", NULL, NULL, "on empile le résultat");
+    }
 }
 
 void nasm_operation(n_operation* n){
@@ -162,11 +194,14 @@ void nasm_operation(n_operation* n){
     if (n->exp2 == NULL) {
         nasm_exp(n->exp1);
         nasm_commande("pop", "eax", NULL, NULL, "depile la permière operande dans eax");
-        if (n->type_operat == o_non){
+        if (n->type_operat == o_non && n->exp1->u.t_type == t_booleen) {
             /*nasm_commande("mov","ebx","1",NULL,"met 1 dans ebx");
             nasm_commande("xor","eax","ebx",NULL,"effectue l'opération");
           */nasm_commande("not", "eax", NULL, NULL, "effectue l'opération");
             nasm_commande("add", "eax", "2", NULL, "effectue l'opération"); // on ajoute 2 car not renvoie 0 ou 1
+        } else {
+            fprintf(stderr, "erreur de type\n");
+            exit(1);
         }
         nasm_commande("push", "eax", NULL, NULL, "empile le résultat");
     } else {

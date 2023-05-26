@@ -1,0 +1,22 @@
+# comparaison < >
+ecrire(1 < 2); # 1
+ecrire(1 > 2); # 0
+ecrire(1 + 2 < 3 + 4); # 1
+ecrire(1 + 2 > 3 + 4); # 0
+ecrire(1 + 2 < 3 + 4 < 5 + 6); # 1
+
+# comparaison <= >= == !=
+ecrire(42); # 42
+ecrire(2 <= 3); # 1
+ecrire(2 <= 2); # 1
+ecrire(2 <= 1); # 0
+ecrire(2 >= 3); # 0
+ecrire(2 >= 2); # 1
+ecrire(2 >= 1); # 1
+ecrire(2 == 3); # 0
+ecrire(2 == 2); # 1
+ecrire(2 == 1); # 0
+ecrire(2 != 3); # 1
+ecrire(2 != 2); # 0
+ecrire(2 != 1); # 1
+

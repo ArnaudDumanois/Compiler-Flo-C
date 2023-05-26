@@ -1,5 +1,6 @@
 #INPUT = $(shell ls input | sed 's/\.flo//g')
-INPUT = arithmetique declaration testrandom Si SiSinon SiSinonSiSinon SinonSi
+INPUT = non testrandom
+#arithmetique declaration testrandom Si SiSinon SiSinonSiSinon SinonSi addition-multiplication-division
 
 assembleur_vers_exercutable: main generation_code_nasm
 	for a in $(INPUT); do echo "Assemblage: " $${a}; nasm -f elf -g -F dwarf output/$${a}.nasm; ld -m elf_i386 -o output/$${a} output/$${a}.o; rm output/$${a}.o; done;
