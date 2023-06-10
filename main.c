@@ -6,6 +6,7 @@
 #include "symboles.h"
 #include "analyse_lexicale.h"
 #include "generation_code.h"
+#include "table_symbole.h"
 
 
 
@@ -17,6 +18,9 @@
 extern FILE *yyin;
 extern n_programme* arbre_abstrait;
 extern int afficher_nasm;
+extern table_symboles *table;
+extern int adresse;
+extern int imbrication;
 
 /*
 * Fonction qui affiche les options de compilation
@@ -36,7 +40,10 @@ void affiche_message_aide(char *nom_prog)
 int main(int argc, char **argv) {
   int affiche_lex = 0;
   int affiche_arbre_abstrait = 0;
-  
+  adresse = 0;
+  imbrication = 0;
+  table = creer_table_symboles();
+
   if(argc <= 2 || argc > 3){
     affiche_message_aide(argv[0]);
     exit(1);
@@ -80,6 +87,7 @@ int main(int argc, char **argv) {
   } 
   
   nasm_prog(arbre_abstrait);
+  //afficher_table_symboles(table);
 
   return 0;
 } 

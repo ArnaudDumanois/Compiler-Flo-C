@@ -3,12 +3,16 @@
 #include <stdio.h>
 #include "arbre_abstrait.h"
 #include "analyse_lexicale.h"
+#include "table_symbole.h"
 
 
 //n_programme* yyparse();
 int yylex();
 int yyerror(const char *s);
 n_programme* arbre_abstrait;
+//table_symboles* table;
+int adresse;
+int imbrication;
 %}
 
 %union {
@@ -102,11 +106,25 @@ listeFonctions
 
 fonction
 	: TYPE_ENTIER IDENTIFIANT PARENTHESE_OUVRANTE listeParametres PARENTHESE_FERMANTE ACCOLADE_OUVRANTE listeInstructions ACCOLADE_FERMANTE {
+	 	//ajouter_table_symboles_fonction(table, t_entier, $2, adresse, imbrication, nombre_parametres($4), creer_list_type($4));
+		//adresse += nombre_parametres($4)*4;
 	      	$$ = creer_n_fonction(t_entier, $2, $4, $7);
-	}
+ ;	}
         | TYPE_BOOLEEN IDENTIFIANT PARENTHESE_OUVRANTE listeParametres PARENTHESE_FERMANTE ACCOLADE_OUVRANTE listeInstructions ACCOLADE_FERMANTE {
+        	//ajouter_table_symboles_fonction(table, t_booleen, $2, adresse, imbrication, nombre_parametres($4), creer_list_type($4));
+		//adresse += nombre_parametres($4)*4;
               	$$ = creer_n_fonction(t_booleen, $2, $4, $7);
         }
+        | TYPE_ENTIER IDENTIFIANT PARENTHESE_OUVRANTE PARENTHESE_FERMANTE ACCOLADE_OUVRANTE listeInstructions ACCOLADE_FERMANTE {
+		//ajouter_table_symboles_fonction(table, t_entier, $2, adresse, imbrication, 0, NULL);
+		//adresse += 4;
+	      	$$ = creer_n_fonction(t_entier, $2, NULL, $6);
+	}
+	| TYPE_BOOLEEN IDENTIFIANT PARENTHESE_OUVRANTE PARENTHESE_FERMANTE ACCOLADE_OUVRANTE listeInstructions ACCOLADE_FERMANTE {
+		//ajouter_table_symboles_fonction(table, t_booleen, $2, adresse, imbrication, 0, NULL);
+		//adresse += 4;
+	      	$$ = creer_n_fonction(t_booleen, $2, NULL, $6);
+	}
 
 listeParametres
 	: parametre {
@@ -166,20 +184,28 @@ ecrire: ECRIRE PARENTHESE_OUVRANTE exprAll PARENTHESE_FERMANTE POINT_VIRGULE {
 
 declaration
 	: TYPE_ENTIER IDENTIFIANT POINT_VIRGULE  {
+		//ajouter_table_symboles(table, t_entier, $2, adresse, imbrication);
+		//adresse += 4;
 		$$ = creer_n_declaration(creer_n_variable($2), t_entier);
 	}
 	| TYPE_BOOLEEN IDENTIFIANT POINT_VIRGULE {
+		//ajouter_table_symboles(table, t_booleen, $2, adresse, imbrication);
+		//adresse += 4;
 		$$ = creer_n_declaration(creer_n_variable($2), t_booleen);
 	}
 
 declarationAffectation
 	: TYPE_ENTIER IDENTIFIANT AFFECTATION exprAll POINT_VIRGULE {
+		//ajouter_table_symboles(table, t_entier, $2, adresse, imbrication);
+		//adresse += 4;
 		n_instruction* decl = creer_n_declaration(creer_n_variable($2), t_entier);
 		n_instruction* aff = creer_n_affectation(creer_n_variable($2), $4);
 		$$ = creer_n_decla_aff(decl, aff);
 
 	}
 	| TYPE_BOOLEEN IDENTIFIANT AFFECTATION exprAll POINT_VIRGULE {
+		//ajouter_table_symboles(table, t_booleen, $2, adresse, imbrication);
+		//adresse += 4;
 		n_instruction* decl = creer_n_declaration(creer_n_variable($2), t_booleen);
 		n_instruction* aff = creer_n_affectation(creer_n_variable($2), $4);
 		$$ = creer_n_decla_aff(decl, aff);
@@ -187,7 +213,12 @@ declarationAffectation
 
 affectation
 	: IDENTIFIANT AFFECTATION exprAll POINT_VIRGULE {
+		//symbole *s = chercher_table_symboles(table, $1);
+		//if(s == NULL) {
+		//	perror("Variable non déclarée");
+		//} else {
 		$$ = creer_n_affectation(creer_n_variable($1), $3);
+		//}
 	}
 
 
@@ -314,7 +345,11 @@ listeExpressions
 
 facteur
 	: IDENTIFIANT {
+		/*if (chercher_table_symboles(table,$1) == NULL) {
+			perror("Variable non déclarée");
+		} else {*/
 		$$ = (n_exp*) creer_n_variable($1);
+		//}
 	}
         | ENTIER {
 		$$ = creer_n_entier($1);
@@ -327,10 +362,28 @@ facteur
 		$$ = creer_n_lire();
 	}
 	| IDENTIFIANT PARENTHESE_OUVRANTE listeExpressions PARENTHESE_FERMANTE {
+		/*int cpt = 0;
+		while ($3 != NULL) {
+			cpt++;
+			$3 = $3->suivant;
+		}
+		symbole *s = chercher_table_symboles(table,$1);
+		if (s->estFonction == 1 && s->nbParametres == cpt) { */
 		$$ = (n_exp*) creer_n_appel($1, $3);
+		/*} else {
+			perror("Nombre de paramètres incorrect");
+			exit(1);
+		}*/
 	}
 	| IDENTIFIANT PARENTHESE_OUVRANTE PARENTHESE_FERMANTE {
+		/*symbole *s = chercher_table_symboles(table,$1);
+		if (s == NULL) {
+			perror("Fonction non déclarée");
+		} else if (s->estFonction == 1 && s->nbParametres == 0) { */
 		$$ = (n_exp*) creer_n_appel($1, NULL);
+		/*} else {
+			perror("Nombre de paramètres incorrect");
+		} */
 	}
 %%
 

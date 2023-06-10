@@ -8,5 +8,7 @@ void nasm_instruction(n_instruction* n);
 void nasm_exp(n_exp* n);
 void nasm_operation(n_operation* n);
 
+void nasm_liste_fonctions(n_l_fonctions* n);
+void nasm_fonction(n_fonction* n);
 
 #endif

@@ -1,1 +1,4 @@
-ecrire(non 1);
+entier a = 1;
+entier b;
+booleen c;
+ecrire(a);

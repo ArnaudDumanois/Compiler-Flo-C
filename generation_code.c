@@ -3,6 +3,8 @@
 #include <string.h>
 #include "arbre_abstrait.h"
 #include "generation_code.h"
+#include "table_symbole.h"
+
 
 //pour afficher le code uniquement si l'option afficher_nasm vaut 1
 #define printifm(format, ...) if(afficher_nasm){ printf(format, __VA_ARGS__); }
@@ -10,6 +12,9 @@
 int afficher_nasm = 1;
 int label_count = 0;
 int fin_si_count = 0;
+int adresse = 0;
+int imbrication = 0;
+table_symboles *table;
 
 /* fonction locale, permet d'afficher un commentaire */
 void nasm_comment(char *comment) {
@@ -44,12 +49,36 @@ void nasm_prog(n_programme *n) {
   printifm("%s", "sinput:\tresb\t255\t;reserve a 255 byte space in memory for the users input string\n");
   printifm("%s","\nsection\t.text\n");
   printifm("%s","\tglobal _start\n");
+
+  if (n->fonctions != NULL){
+      nasm_liste_fonctions(n->fonctions);
+  }
+
   printifm("%s","_start:\n");
-  nasm_liste_instructions(n->instructions);
+
+  if (n->instructions != NULL){
+    nasm_liste_instructions(n->instructions);
+  }
 
   //pour quitter le programme
   nasm_commande("mov", "eax", "1" , NULL, "1 est le code de SYS_EXIT");
   nasm_commande("int", "0x80", NULL, NULL, "exit");
+}
+
+void nasm_liste_fonctions(n_l_fonctions *n) {
+    do {
+        if (n->fonction != NULL){
+            nasm_fonction(n->fonction);
+        }
+        n = n->suivant;
+    } while(n != NULL );
+}
+
+void nasm_fonction(n_fonction *n) {
+    printifm("_%s:\n", n->nom);
+    //nasm_commande("push", "ebp", NULL, NULL, "on empile ebp");
+    nasm_commande("mov", "ebp", "esp", NULL, "on met esp dans ebp");
+    nasm_liste_instructions(n->instructions);
 }
 
 void nasm_liste_instructions(n_l_instructions *n) {
@@ -68,27 +97,43 @@ void nasm_instruction(n_instruction* n) {
         nasm_commande("call", "iprintLF", NULL, NULL, NULL); //on envoie la valeur d'eax sur la sortie standard
     } else if (n->type_instruction == i_declaration) {
         if (n->u.declaration->t_type == t_entier) {
+            adresse += 4;
+            ajouter_table_symboles(table, t_entier, n->u.declaration->variable->nom, adresse, imbrication);
             nasm_commande("sub", "esp", "4", NULL, "on réserve 4 octets pour la variable");
             nasm_commande("mov", "dword [esp]", "0", NULL, "on initialise la variable à 0");
         } else if (n->u.declaration->t_type == t_booleen) {
+            adresse += 4;
+            ajouter_table_symboles(table, t_booleen, n->u.declaration->variable->nom, adresse, imbrication);
             nasm_commande("sub", "esp", "4", NULL, "on réserve 4 octets pour la variable");
             nasm_commande("mov", "dword [esp]", "0", NULL, "on initialise la variable à 0");
         }
     } else if (n->type_instruction == i_affectation) {
         if (n->u.affectation->variable->t_type == t_entier) {
-            nasm_exp(n->u.affectation->exp);
-            nasm_commande("pop", "eax", NULL, NULL, "on dépile la valeur d'expression sur eax");
-            nasm_commande("mov", "dword [esp]", "eax", NULL, "on met la valeur de eax dans la variable");
+            if (chercher_table_symboles(table, n->u.affectation->variable->nom) != NULL) {
+                nasm_exp(n->u.affectation->exp);
+                nasm_commande("pop", "eax", NULL, NULL, "on dépile la valeur d'expression sur eax");
+                nasm_commande("mov", "dword [esp]", "eax", NULL, "on met la valeur de eax dans la variable");
+            } else {
+                printf("Erreur : la variable %s n'est pas déclarée\n", n->u.affectation->variable->nom);
+            }
         } else if (n->u.affectation->variable->t_type == t_booleen) {
-            nasm_exp(n->u.affectation->exp);
-            nasm_commande("pop", "eax", NULL, NULL, NULL);
-            nasm_commande("mov", "dword [esp]", "eax", NULL, NULL);
+            if (chercher_table_symboles(table, n->u.affectation->variable->nom) != NULL) {
+                nasm_exp(n->u.affectation->exp);
+                nasm_commande("pop", "eax", NULL, NULL, "on dépile la valeur d'expression sur eax");
+                nasm_commande("mov", "dword [esp]", "eax", NULL, "on met la valeur de eax dans la variable");
+            } else {
+                printf("Erreur : la variable %s n'est pas déclarée\n", n->u.affectation->variable->nom);
+            }
         }
     } else if (n->type_instruction == i_decla_aff) {
         if (n->u.decla_aff->declaration->u.declaration->t_type == t_entier && n->u.decla_aff->affectation->u.affectation->variable->t_type == t_entier) {
+            //ajouter_table_symboles(table, t_entier, n->u.decla_aff->declaration->u.declaration->variable->nom, adresse, imbrication);
+            //adresse += 4;
             nasm_instruction(n->u.decla_aff->declaration);
             nasm_instruction(n->u.decla_aff->affectation);
         } else if (n->u.decla_aff->declaration->u.declaration->t_type == t_booleen&& n->u.decla_aff->affectation->u.affectation->variable->t_type == t_booleen) {
+            //ajouter_table_symboles(table, t_booleen, n->u.decla_aff->declaration->u.declaration->variable->nom, adresse, imbrication);
+            //adresse += 4;
             nasm_instruction(n->u.decla_aff->declaration);
             nasm_instruction(n->u.decla_aff->affectation);
         }
@@ -171,6 +216,20 @@ void nasm_instruction(n_instruction* n) {
         sprintf(label_endwhile, "endwhile%d:", label_count);
         nasm_commande(label_endwhile, NULL, NULL, NULL, "on sort du while");
         label_count++;
+    } else if (n->type_instruction == i_retour) {
+        nasm_exp(n->u.retour->exp);
+        nasm_commande("pop", "eax", NULL, NULL, NULL);
+        nasm_commande("ret", NULL, NULL, NULL, "on retourne");
+    } else if (n->type_instruction == i_appelF) {
+        char buffer[10];
+        sprintf(buffer, "_%s", n->u.appelF->nom);
+        nasm_commande("push","ebp", NULL, NULL, "on sauvegarde ebp");
+        while (n->u.appelF->arguments != NULL) {
+            nasm_exp(n->u.appelF->arguments->exp);
+            n->u.appelF->arguments = n->u.appelF->arguments->suivant;
+        }
+        nasm_commande("call", buffer, NULL, NULL, "on appelle la fonction");
+        nasm_commande("pop", "ebp", NULL, NULL, "on restaure ebp");
     }
 }
 
@@ -186,6 +245,24 @@ void nasm_exp(n_exp* n){
         nasm_commande("call", "readline", NULL, NULL, "on appelle readline");
         nasm_commande("call", "atoi", NULL, NULL, "on convertit la chaine en entier");
         nasm_commande("push", "eax", NULL, NULL, "on empile le résultat");
+    } else if (n->type_exp == i_appel) {
+        char buffer[10];
+        sprintf(buffer, "_%s", n->u.appel->nom);
+        nasm_commande("call", buffer, NULL, NULL, "on appelle la fonction");
+        nasm_commande("push", "eax", NULL, NULL, "on empile le résultat");
+    } else if (n->type_exp == i_variable) {
+        if (chercher_table_symboles(table, n->u.variable->nom) != NULL) {
+            char buffer[10];
+            sprintf(buffer, "%d", chercher_table_symboles(table, n->u.variable->nom)->adresse);
+            nasm_commande("push", "ebp", NULL, NULL, "on sauvegarde ebp");
+            nasm_commande("mov", "ebp", buffer, NULL, "on met l'adresse de la variable dans ebp");
+            nasm_commande("mov", "eax", "(ebp)", NULL, "on met la valeur de la variable dans eax");
+            nasm_commande("pop", "ebp", NULL, NULL, "on restaure ebp");
+            nasm_commande("push", "eax", NULL, NULL, "on empile le résultat");
+        } else {
+            fprintf(stderr, "erreur de compilation : variable %s non déclarée\n", n->u.variable->nom);
+            exit(1);
+        }
     }
 }
 
@@ -216,7 +293,8 @@ void nasm_operation(n_operation* n){
         } else if (n->type_operation == '-') {
             nasm_commande("sub", "eax", "ebx", NULL, "effectue l'opération");
         } else if (n->type_operation == '/') {
-            nasm_commande("mov", "edx", "0", NULL, "met 0 dans edx");
+            //nasm_commande("mov", "edx", "0", NULL, "met 0 dans edx");
+            nasm_commande("cdq", NULL, NULL, NULL, "met edx à 0 si eax positif, -1 sinon");
             nasm_commande("idiv", "ebx", NULL, NULL, "effectue l'opération");
         } else if (n->type_operation == '%') {
             nasm_commande("mov", "edx", "0", NULL, "met 0 dans edx");

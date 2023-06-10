@@ -72,14 +72,18 @@
 #include <stdio.h>
 #include "arbre_abstrait.h"
 #include "analyse_lexicale.h"
+#include "table_symbole.h"
 
 
 //n_programme* yyparse();
 int yylex();
 int yyerror(const char *s);
 n_programme* arbre_abstrait;
+//table_symboles* table;
+int adresse;
+int imbrication;
 
-#line 83 "analyse_syntaxique.c"
+#line 87 "analyse_syntaxique.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -169,7 +173,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 14 "analyse_syntaxique.y"
+#line 18 "analyse_syntaxique.y"
 
     int entier;
     n_programme* prog;
@@ -184,7 +188,7 @@ union YYSTYPE
     n_l_parametres* l_parametres;
     n_parametre* parametre;
 
-#line 188 "analyse_syntaxique.c"
+#line 192 "analyse_syntaxique.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -480,16 +484,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  39
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   166
+#define YYLAST   175
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  37
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  22
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  63
+#define YYNRULES  65
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  149
+#define YYNSTATES  157
 
 #define YYUNDEFTOK  2
 #define YYMAXUTOK   291
@@ -540,13 +544,13 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    86,    86,    89,    94,    97,   103,   106,   111,   114,
-     119,   122,   129,   132,   137,   140,   143,   146,   149,   152,
-     155,   158,   162,   167,   170,   175,   181,   188,   194,   198,
-     202,   207,   213,   216,   221,   226,   231,   236,   241,   244,
-     247,   250,   253,   259,   262,   265,   268,   271,   274,   277,
-     280,   283,   286,   289,   292,   295,   298,   307,   310,   315,
-     318,   325,   328,   331
+       0,    91,    91,    94,    99,   102,   108,   113,   118,   123,
+     130,   133,   138,   141,   148,   151,   156,   159,   162,   165,
+     168,   171,   174,   177,   181,   186,   191,   198,   206,   215,
+     226,   230,   234,   239,   245,   248,   253,   258,   263,   268,
+     273,   276,   279,   282,   285,   291,   294,   297,   300,   303,
+     306,   309,   312,   315,   318,   321,   324,   327,   330,   339,
+     342,   347,   354,   361,   364,   378
 };
 #endif
 
@@ -596,21 +600,22 @@ static const yytype_int16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-      54,    18,    19,    27,    44,    48,    56,    64,    75,    54,
-     -72,   -72,    66,   -72,   -72,   -72,   -72,   -72,   -72,   -72,
-     -72,    48,    48,    48,    48,    48,    78,    48,   -72,    80,
-      48,    91,   -72,    74,    28,   110,   -72,     1,     2,   -72,
-     -72,   -72,    83,    89,   -72,    86,    96,    99,   101,   102,
-     103,    21,     4,   104,   -72,   -72,   -72,    48,    48,    91,
-      91,    91,    91,    91,    91,    91,    91,    91,    91,    91,
-      45,   -72,    48,    45,   -72,    48,    41,    52,    48,   105,
-     -72,   106,    93,    98,   -72,   112,   -72,   -72,    92,   -72,
-     110,   -16,   -16,   -16,   -16,   -16,    35,   -72,   -72,   -72,
-      35,   124,   125,   128,   111,   130,   129,   131,   -72,   -72,
-     -72,    66,    66,   -72,   -72,   -72,   113,    45,   -72,   126,
-     -72,   132,   133,    66,   -72,    66,    76,   -72,   134,   135,
-     127,   141,   136,   -72,   -72,    66,    48,   137,   139,   142,
-      66,   -72,   140,   143,    66,   -72,   144,   145,   -72
+      40,    13,    24,    41,    43,    48,    51,    61,     6,    40,
+     -72,   -72,    58,   -72,   -72,   -72,   -72,   -72,   -72,   -72,
+     -72,    48,    48,    48,    48,    48,    65,    48,   -72,    71,
+      48,    90,   -72,    50,   -11,   116,   -72,     3,     7,   -72,
+     -72,   -72,    81,    87,   -72,    60,    98,   100,   103,   106,
+     112,    22,     5,   115,   -72,   -72,   -72,    48,    48,    90,
+      90,    90,    90,    90,    90,    90,    90,    90,    90,    90,
+      53,   -72,    48,    55,   -72,    48,    -1,    56,    48,   117,
+     -72,   118,   104,   108,   -72,   127,   -72,   -72,   107,   -72,
+     116,    70,    70,    70,    70,    70,    85,   -72,   -72,   -72,
+      85,   119,   132,   134,   133,   123,   136,   135,   144,   145,
+     -72,   -72,   -72,    58,    58,   -72,    58,   -72,   -72,   137,
+     -10,   -72,    58,   138,   -72,   140,   141,   142,    58,   -72,
+     143,    58,    75,   -72,   -72,   146,   -72,   147,   148,   149,
+     130,   -72,   -72,    58,    48,   150,   152,   155,    58,   -72,
+     153,   156,    58,   -72,   157,   154,   -72
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -619,35 +624,36 @@ static const yytype_int16 yypact[] =
 static const yytype_int8 yydefact[] =
 {
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       4,     2,    12,    14,    20,    21,    15,    16,    17,    18,
-      19,     0,     0,     0,     0,     0,    59,     0,    60,     0,
-       0,     0,    38,     0,    37,    39,    56,     0,     0,     1,
-       5,     3,     0,     0,    13,    57,     0,     0,     0,     0,
-       0,     0,     0,     0,    42,    48,    35,     0,     0,     0,
+       4,     2,    14,    16,    22,    23,    17,    18,    19,    20,
+      21,     0,     0,     0,     0,     0,    61,     0,    62,     0,
+       0,     0,    40,     0,    39,    41,    58,     0,     0,     1,
+       5,     3,     0,     0,    15,    59,     0,     0,     0,     0,
+       0,     0,     0,     0,    44,    50,    37,     0,     0,     0,
        0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,    23,     0,     0,    24,     0,     0,     0,     0,     0,
-      27,     0,     0,     0,    63,     0,    49,    61,    40,    41,
-      54,    55,    52,    50,    53,    51,    44,    46,    47,    45,
-      43,     0,     0,     0,     8,     0,     0,     0,    58,    36,
-      22,     0,     0,    62,    10,    11,     0,     0,    25,     0,
-      26,     0,     0,     0,     9,     0,    28,    34,     0,     0,
-       0,     0,    30,     6,     7,     0,     0,     0,     0,     0,
-       0,    29,     0,     0,     0,    31,     0,    32,    33
+       0,    25,     0,     0,    26,     0,     0,     0,     0,     0,
+      29,     0,     0,     0,    65,     0,    51,    63,    42,    43,
+      56,    57,    54,    52,    55,    53,    46,    48,    49,    47,
+      45,     0,     0,     0,     0,    10,     0,     0,     0,     0,
+      60,    38,    24,     0,     0,    64,     0,    12,    13,     0,
+       0,    27,     0,     0,    28,     0,     0,     0,     0,    11,
+       0,     0,    30,    36,     8,     0,     9,     0,     0,     0,
+      32,     6,     7,     0,     0,     0,     0,     0,     0,    31,
+       0,     0,     0,    33,     0,    34,    35
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
-     -72,   -72,   -72,   149,   -71,   -72,    -9,   -72,   -72,   -72,
-     -72,   -72,   -72,    -1,   -72,   -72,   -72,    -4,    33,   -27,
-     -34,   -72
+     -72,   -72,   -72,   160,   -71,   -72,    -9,   -72,   -72,   -72,
+     -72,   -72,   -72,     9,   -72,   -72,   -72,    -4,    52,   -27,
+       2,   -72
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int16 yydefgoto[] =
 {
-      -1,     8,     9,    10,   103,   104,    11,    12,    13,    14,
-      15,    16,    17,   132,    18,    19,    20,    45,    34,    35,
+      -1,     8,     9,    10,   104,   105,    11,    12,    13,    14,
+      15,    16,    17,   140,    18,    19,    20,    45,    34,    35,
       46,    36
 };
 
@@ -656,44 +662,46 @@ static const yytype_int16 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      41,    33,   106,    44,    55,    70,    73,    71,    74,    86,
-      72,    75,    65,    66,    67,    68,    69,    85,    47,    48,
-      49,    50,    21,    23,    26,    27,    84,    22,    28,    57,
-      58,    24,    90,    91,    92,    93,    94,    95,    96,    97,
-      98,    99,   100,    29,   108,    30,   124,    71,    25,    31,
-      72,    26,    27,    57,    58,    28,    32,     1,    74,    37,
-      52,    75,     2,    54,    66,    67,    68,    38,   105,     1,
-      29,   107,    30,     3,     2,    39,    31,     4,   101,   102,
-      56,     5,    51,    32,    53,     3,    76,     6,     7,     4,
-      88,    89,    77,     5,    26,    27,   130,   131,    28,    42,
-      43,    79,   121,   122,    78,    80,    81,    82,    83,    87,
-     111,   109,   110,    29,   128,   112,   129,   113,    58,    31,
-      59,    60,    61,    62,    63,    64,   138,   114,   115,   117,
-     123,   143,   139,   116,   119,   146,   118,   120,    65,    66,
-      67,    68,    69,   125,   135,   136,   148,   142,   126,   127,
-     133,   134,     0,     0,   140,   141,   137,   144,    40,   145,
-     147,     0,     0,     0,     0,     0,   131
+      41,    33,   108,    44,    55,    71,    39,    70,    72,    71,
+      86,    73,    72,    74,    57,    58,    75,    21,    47,    48,
+      49,    50,    22,   102,   103,    26,    27,    84,    23,    28,
+      57,    58,    90,    91,    92,    93,    94,    95,    96,    97,
+      98,    99,   100,     1,    29,    24,    30,    25,     2,   129,
+      31,    26,    27,    85,    37,    28,    56,    32,   101,     3,
+     107,     1,    74,     4,    38,    75,     2,     5,   106,    51,
+      29,   109,    30,     6,     7,    53,    31,     3,    78,    52,
+     110,     4,    54,    32,    76,     5,   102,   103,   102,   103,
+      77,    42,    43,    26,    27,   138,   139,    28,    65,    66,
+      67,    68,    69,    79,   125,   126,    80,   127,    81,    88,
+      89,    82,    29,   130,    66,    67,    68,    83,    31,   135,
+      87,   113,   137,   111,   112,   114,    59,    60,    61,    62,
+      63,    64,   115,    58,   146,   117,   116,   118,   119,   151,
+     147,   120,   121,   154,    65,    66,    67,    68,    69,   123,
+     145,   124,   122,   144,   128,   131,   132,   133,   134,   136,
+     150,     0,   141,   142,   156,   143,     0,   148,   149,    40,
+     152,     0,   153,   155,     0,   139
 };
 
 static const yytype_int16 yycheck[] =
 {
-       9,     5,    73,    12,    31,     4,     4,     6,     6,     5,
-       9,     9,    28,    29,    30,    31,    32,    51,    22,    23,
-      24,    25,     4,     4,     3,     4,     5,     9,     7,    25,
-      26,     4,    59,    60,    61,    62,    63,    64,    65,    66,
-      67,    68,    69,    22,    78,    24,   117,     6,     4,    28,
-       9,     3,     4,    25,    26,     7,    35,     3,     6,     3,
-      27,     9,     8,    30,    29,    30,    31,     3,    72,     3,
-      22,    75,    24,    19,     8,     0,    28,    23,    33,    34,
-       6,    27,     4,    35,     4,    19,     3,    33,    34,    23,
-      57,    58,     3,    27,     3,     4,    20,    21,     7,    33,
-      34,     5,   111,   112,    18,     6,     5,     5,     5,     5,
-      17,     6,     6,    22,   123,    17,   125,     5,    26,    28,
-      10,    11,    12,    13,    14,    15,   135,     3,     3,    18,
-      17,   140,   136,     5,     5,   144,     6,     6,    28,    29,
-      30,    31,    32,    17,    17,     4,   147,     5,    16,    16,
-      16,    16,    -1,    -1,    17,    16,    20,    17,     9,    16,
-      16,    -1,    -1,    -1,    -1,    -1,    21
+       9,     5,    73,    12,    31,     6,     0,     4,     9,     6,
+       5,     4,     9,     6,    25,    26,     9,     4,    22,    23,
+      24,    25,     9,    33,    34,     3,     4,     5,     4,     7,
+      25,    26,    59,    60,    61,    62,    63,    64,    65,    66,
+      67,    68,    69,     3,    22,     4,    24,     4,     8,   120,
+      28,     3,     4,    51,     3,     7,     6,    35,     5,    19,
+       5,     3,     6,    23,     3,     9,     8,    27,    72,     4,
+      22,    75,    24,    33,    34,     4,    28,    19,    18,    27,
+      78,    23,    30,    35,     3,    27,    33,    34,    33,    34,
+       3,    33,    34,     3,     4,    20,    21,     7,    28,    29,
+      30,    31,    32,     5,   113,   114,     6,   116,     5,    57,
+      58,     5,    22,   122,    29,    30,    31,     5,    28,   128,
+       5,    17,   131,     6,     6,    17,    10,    11,    12,    13,
+      14,    15,     5,    26,   143,     3,    17,     3,     5,   148,
+     144,    18,     6,   152,    28,    29,    30,    31,    32,     5,
+      20,     6,    17,     4,    17,    17,    16,    16,    16,    16,
+       5,    -1,    16,    16,   155,    17,    -1,    17,    16,     9,
+      17,    -1,    16,    16,    -1,    21
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -710,35 +718,36 @@ static const yytype_int8 yystos[] =
        4,     6,     9,     4,     6,     9,     3,     3,    18,     5,
        6,     5,     5,     5,     5,    57,     5,     5,    55,    55,
       56,    56,    56,    56,    56,    56,    56,    56,    56,    56,
-      56,    33,    34,    41,    42,    54,    41,    54,    57,     6,
-       6,    17,    17,     5,     3,     3,     5,    18,     6,     5,
-       6,    43,    43,    17,    41,    17,    16,    16,    43,    43,
-      20,    21,    50,    16,    16,    17,     4,    20,    43,    54,
-      17,    16,     5,    43,    17,    16,    43,    16,    50
+      56,     5,    33,    34,    41,    42,    54,     5,    41,    54,
+      57,     6,     6,    17,    17,     5,    17,     3,     3,     5,
+      18,     6,    17,     5,     6,    43,    43,    43,    17,    41,
+      43,    17,    16,    16,    16,    43,    16,    43,    20,    21,
+      50,    16,    16,    17,     4,    20,    43,    54,    17,    16,
+       5,    43,    17,    16,    43,    16,    50
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    37,    38,    38,    39,    39,    40,    40,    41,    41,
-      42,    42,    43,    43,    44,    44,    44,    44,    44,    44,
-      44,    44,    45,    46,    46,    47,    47,    48,    49,    49,
-      49,    49,    50,    50,    51,    52,    53,    54,    55,    55,
-      55,    55,    55,    56,    56,    56,    56,    56,    56,    56,
-      56,    56,    56,    56,    56,    56,    56,    57,    57,    58,
-      58,    58,    58,    58
+       0,    37,    38,    38,    39,    39,    40,    40,    40,    40,
+      41,    41,    42,    42,    43,    43,    44,    44,    44,    44,
+      44,    44,    44,    44,    45,    46,    46,    47,    47,    48,
+      49,    49,    49,    49,    50,    50,    51,    52,    53,    54,
+      55,    55,    55,    55,    55,    56,    56,    56,    56,    56,
+      56,    56,    56,    56,    56,    56,    56,    56,    56,    57,
+      57,    58,    58,    58,    58,    58
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     2,     1,     2,     8,     8,     1,     3,
-       2,     2,     1,     2,     1,     1,     1,     1,     1,     1,
-       1,     1,     5,     3,     3,     5,     5,     4,     7,    11,
-       8,    12,     7,     8,     7,     3,     5,     1,     1,     1,
-       3,     3,     2,     3,     3,     3,     3,     3,     2,     3,
-       3,     3,     3,     3,     3,     3,     1,     1,     3,     1,
-       1,     3,     4,     3
+       0,     2,     1,     2,     1,     2,     8,     8,     7,     7,
+       1,     3,     2,     2,     1,     2,     1,     1,     1,     1,
+       1,     1,     1,     1,     5,     3,     3,     5,     5,     4,
+       7,    11,     8,    12,     7,     8,     7,     3,     5,     1,
+       1,     1,     3,     3,     2,     3,     3,     3,     3,     3,
+       2,     3,     3,     3,     3,     3,     3,     3,     1,     1,
+       3,     1,     1,     3,     4,     3
 };
 
 
@@ -1694,512 +1703,571 @@ yyreduce:
     switch (yyn)
       {
   case 2:
-#line 86 "analyse_syntaxique.y"
+#line 91 "analyse_syntaxique.y"
                             {
 	   arbre_abstrait = creer_n_programme(NULL,(yyvsp[0].l_inst));
 	}
-#line 1702 "analyse_syntaxique.c"
+#line 1711 "analyse_syntaxique.c"
     break;
 
   case 3:
-#line 89 "analyse_syntaxique.y"
+#line 94 "analyse_syntaxique.y"
                                            {
 	   arbre_abstrait = creer_n_programme((yyvsp[-1].l_fonctions),(yyvsp[0].l_inst));
 	}
-#line 1710 "analyse_syntaxique.c"
+#line 1719 "analyse_syntaxique.c"
     break;
 
   case 4:
-#line 94 "analyse_syntaxique.y"
+#line 99 "analyse_syntaxique.y"
                    {
 		(yyval.l_fonctions) = creer_n_l_fonctions((yyvsp[0].fonction), NULL);
 	}
-#line 1718 "analyse_syntaxique.c"
+#line 1727 "analyse_syntaxique.c"
     break;
 
   case 5:
-#line 97 "analyse_syntaxique.y"
+#line 102 "analyse_syntaxique.y"
                                   {
 		(yyval.l_fonctions) = creer_n_l_fonctions((yyvsp[0].fonction), (yyvsp[-1].l_fonctions));
 	}
-#line 1726 "analyse_syntaxique.c"
+#line 1735 "analyse_syntaxique.c"
     break;
 
   case 6:
-#line 103 "analyse_syntaxique.y"
+#line 108 "analyse_syntaxique.y"
                                                                                                                                                 {
+	 	//ajouter_table_symboles_fonction(table, t_entier, $2, adresse, imbrication, nombre_parametres($4), creer_list_type($4));
+		//adresse += nombre_parametres($4)*4;
 	      	(yyval.fonction) = creer_n_fonction(t_entier, (yyvsp[-6].ident), (yyvsp[-4].l_parametres), (yyvsp[-1].l_inst));
-	}
-#line 1734 "analyse_syntaxique.c"
+ ;	}
+#line 1745 "analyse_syntaxique.c"
     break;
 
   case 7:
-#line 106 "analyse_syntaxique.y"
+#line 113 "analyse_syntaxique.y"
                                                                                                                                                  {
+        	//ajouter_table_symboles_fonction(table, t_booleen, $2, adresse, imbrication, nombre_parametres($4), creer_list_type($4));
+		//adresse += nombre_parametres($4)*4;
               	(yyval.fonction) = creer_n_fonction(t_booleen, (yyvsp[-6].ident), (yyvsp[-4].l_parametres), (yyvsp[-1].l_inst));
         }
-#line 1742 "analyse_syntaxique.c"
+#line 1755 "analyse_syntaxique.c"
     break;
 
   case 8:
-#line 111 "analyse_syntaxique.y"
-                    {
-		(yyval.l_parametres) = creer_n_l_parametres((yyvsp[0].parametre), NULL);
+#line 118 "analyse_syntaxique.y"
+                                                                                                                                {
+		//ajouter_table_symboles_fonction(table, t_entier, $2, adresse, imbrication, 0, NULL);
+		//adresse += 4;
+	      	(yyval.fonction) = creer_n_fonction(t_entier, (yyvsp[-5].ident), NULL, (yyvsp[-1].l_inst));
 	}
-#line 1750 "analyse_syntaxique.c"
+#line 1765 "analyse_syntaxique.c"
     break;
 
   case 9:
-#line 114 "analyse_syntaxique.y"
-                                            {
-		(yyval.l_parametres) = creer_n_l_parametres((yyvsp[-2].parametre), (yyvsp[0].l_parametres));
+#line 123 "analyse_syntaxique.y"
+                                                                                                                                 {
+		//ajouter_table_symboles_fonction(table, t_booleen, $2, adresse, imbrication, 0, NULL);
+		//adresse += 4;
+	      	(yyval.fonction) = creer_n_fonction(t_booleen, (yyvsp[-5].ident), NULL, (yyvsp[-1].l_inst));
 	}
-#line 1758 "analyse_syntaxique.c"
+#line 1775 "analyse_syntaxique.c"
     break;
 
   case 10:
-#line 119 "analyse_syntaxique.y"
-                                  {
-		(yyval.parametre) = creer_n_parametre(t_entier, (yyvsp[0].ident));
+#line 130 "analyse_syntaxique.y"
+                    {
+		(yyval.l_parametres) = creer_n_l_parametres((yyvsp[0].parametre), NULL);
 	}
-#line 1766 "analyse_syntaxique.c"
+#line 1783 "analyse_syntaxique.c"
     break;
 
   case 11:
-#line 122 "analyse_syntaxique.y"
-                                   {
-		(yyval.parametre) = creer_n_parametre(t_booleen, (yyvsp[0].ident));
+#line 133 "analyse_syntaxique.y"
+                                            {
+		(yyval.l_parametres) = creer_n_l_parametres((yyvsp[-2].parametre), (yyvsp[0].l_parametres));
 	}
-#line 1774 "analyse_syntaxique.c"
+#line 1791 "analyse_syntaxique.c"
     break;
 
   case 12:
-#line 129 "analyse_syntaxique.y"
-                      {
-		(yyval.l_inst) = creer_n_l_instructions((yyvsp[0].inst) ,NULL);
+#line 138 "analyse_syntaxique.y"
+                                  {
+		(yyval.parametre) = creer_n_parametre(t_entier, (yyvsp[0].ident));
 	}
-#line 1782 "analyse_syntaxique.c"
+#line 1799 "analyse_syntaxique.c"
     break;
 
   case 13:
-#line 132 "analyse_syntaxique.y"
-                                        {
-		(yyval.l_inst) =creer_n_l_instructions((yyvsp[-1].inst) ,(yyvsp[0].l_inst));
+#line 141 "analyse_syntaxique.y"
+                                   {
+		(yyval.parametre) = creer_n_parametre(t_booleen, (yyvsp[0].ident));
 	}
-#line 1790 "analyse_syntaxique.c"
+#line 1807 "analyse_syntaxique.c"
     break;
 
   case 14:
-#line 137 "analyse_syntaxique.y"
-                 {
-		(yyval.inst) = (yyvsp[0].inst);
+#line 148 "analyse_syntaxique.y"
+                      {
+		(yyval.l_inst) = creer_n_l_instructions((yyvsp[0].inst) ,NULL);
 	}
-#line 1798 "analyse_syntaxique.c"
+#line 1815 "analyse_syntaxique.c"
     break;
 
   case 15:
-#line 140 "analyse_syntaxique.y"
-                      {
-		(yyval.inst) = (yyvsp[0].inst);
+#line 151 "analyse_syntaxique.y"
+                                        {
+		(yyval.l_inst) =creer_n_l_instructions((yyvsp[-1].inst) ,(yyvsp[0].l_inst));
 	}
-#line 1806 "analyse_syntaxique.c"
+#line 1823 "analyse_syntaxique.c"
     break;
 
   case 16:
-#line 143 "analyse_syntaxique.y"
-                         {
+#line 156 "analyse_syntaxique.y"
+                 {
 		(yyval.inst) = (yyvsp[0].inst);
 	}
-#line 1814 "analyse_syntaxique.c"
+#line 1831 "analyse_syntaxique.c"
     break;
 
   case 17:
-#line 146 "analyse_syntaxique.y"
-                       {
-		(yyval.inst) = (yyvsp[0].inst);
-	}
-#line 1822 "analyse_syntaxique.c"
-    break;
-
-  case 18:
-#line 149 "analyse_syntaxique.y"
-                    {
-		(yyval.inst) = (yyvsp[0].inst);
-	}
-#line 1830 "analyse_syntaxique.c"
-    break;
-
-  case 19:
-#line 152 "analyse_syntaxique.y"
-                        {
-		(yyval.inst) = (yyvsp[0].inst);
-	}
-#line 1838 "analyse_syntaxique.c"
-    break;
-
-  case 20:
-#line 155 "analyse_syntaxique.y"
+#line 159 "analyse_syntaxique.y"
                       {
 		(yyval.inst) = (yyvsp[0].inst);
 	}
-#line 1846 "analyse_syntaxique.c"
+#line 1839 "analyse_syntaxique.c"
+    break;
+
+  case 18:
+#line 162 "analyse_syntaxique.y"
+                         {
+		(yyval.inst) = (yyvsp[0].inst);
+	}
+#line 1847 "analyse_syntaxique.c"
+    break;
+
+  case 19:
+#line 165 "analyse_syntaxique.y"
+                       {
+		(yyval.inst) = (yyvsp[0].inst);
+	}
+#line 1855 "analyse_syntaxique.c"
+    break;
+
+  case 20:
+#line 168 "analyse_syntaxique.y"
+                    {
+		(yyval.inst) = (yyvsp[0].inst);
+	}
+#line 1863 "analyse_syntaxique.c"
     break;
 
   case 21:
-#line 158 "analyse_syntaxique.y"
-                                 {
+#line 171 "analyse_syntaxique.y"
+                        {
 		(yyval.inst) = (yyvsp[0].inst);
 	}
-#line 1854 "analyse_syntaxique.c"
+#line 1871 "analyse_syntaxique.c"
     break;
 
   case 22:
-#line 162 "analyse_syntaxique.y"
-                                                                             {
-		(yyval.inst) = creer_n_ecrire((yyvsp[-2].exp));
+#line 174 "analyse_syntaxique.y"
+                      {
+		(yyval.inst) = (yyvsp[0].inst);
 	}
-#line 1862 "analyse_syntaxique.c"
+#line 1879 "analyse_syntaxique.c"
     break;
 
   case 23:
-#line 167 "analyse_syntaxique.y"
-                                                 {
-		(yyval.inst) = creer_n_declaration(creer_n_variable((yyvsp[-1].ident)), t_entier);
+#line 177 "analyse_syntaxique.y"
+                                 {
+		(yyval.inst) = (yyvsp[0].inst);
 	}
-#line 1870 "analyse_syntaxique.c"
+#line 1887 "analyse_syntaxique.c"
     break;
 
   case 24:
-#line 170 "analyse_syntaxique.y"
-                                                 {
-		(yyval.inst) = creer_n_declaration(creer_n_variable((yyvsp[-1].ident)), t_booleen);
+#line 181 "analyse_syntaxique.y"
+                                                                             {
+		(yyval.inst) = creer_n_ecrire((yyvsp[-2].exp));
 	}
-#line 1878 "analyse_syntaxique.c"
+#line 1895 "analyse_syntaxique.c"
     break;
 
   case 25:
-#line 175 "analyse_syntaxique.y"
+#line 186 "analyse_syntaxique.y"
+                                                 {
+		//ajouter_table_symboles(table, t_entier, $2, adresse, imbrication);
+		//adresse += 4;
+		(yyval.inst) = creer_n_declaration(creer_n_variable((yyvsp[-1].ident)), t_entier);
+	}
+#line 1905 "analyse_syntaxique.c"
+    break;
+
+  case 26:
+#line 191 "analyse_syntaxique.y"
+                                                 {
+		//ajouter_table_symboles(table, t_booleen, $2, adresse, imbrication);
+		//adresse += 4;
+		(yyval.inst) = creer_n_declaration(creer_n_variable((yyvsp[-1].ident)), t_booleen);
+	}
+#line 1915 "analyse_syntaxique.c"
+    break;
+
+  case 27:
+#line 198 "analyse_syntaxique.y"
                                                                     {
+		//ajouter_table_symboles(table, t_entier, $2, adresse, imbrication);
+		//adresse += 4;
 		n_instruction* decl = creer_n_declaration(creer_n_variable((yyvsp[-3].ident)), t_entier);
 		n_instruction* aff = creer_n_affectation(creer_n_variable((yyvsp[-3].ident)), (yyvsp[-1].exp));
 		(yyval.inst) = creer_n_decla_aff(decl, aff);
 
 	}
-#line 1889 "analyse_syntaxique.c"
+#line 1928 "analyse_syntaxique.c"
     break;
 
-  case 26:
-#line 181 "analyse_syntaxique.y"
+  case 28:
+#line 206 "analyse_syntaxique.y"
                                                                      {
+		//ajouter_table_symboles(table, t_booleen, $2, adresse, imbrication);
+		//adresse += 4;
 		n_instruction* decl = creer_n_declaration(creer_n_variable((yyvsp[-3].ident)), t_booleen);
 		n_instruction* aff = creer_n_affectation(creer_n_variable((yyvsp[-3].ident)), (yyvsp[-1].exp));
 		(yyval.inst) = creer_n_decla_aff(decl, aff);
 	}
-#line 1899 "analyse_syntaxique.c"
-    break;
-
-  case 27:
-#line 188 "analyse_syntaxique.y"
-                                                        {
-		(yyval.inst) = creer_n_affectation(creer_n_variable((yyvsp[-3].ident)), (yyvsp[-1].exp));
-	}
-#line 1907 "analyse_syntaxique.c"
-    break;
-
-  case 28:
-#line 194 "analyse_syntaxique.y"
-                                                                                                                   {
-		(yyval.inst) = creer_n_conditionnelle((yyvsp[-4].exp), (yyvsp[-1].l_inst), NULL, NULL);
-	}
-#line 1915 "analyse_syntaxique.c"
+#line 1940 "analyse_syntaxique.c"
     break;
 
   case 29:
-#line 198 "analyse_syntaxique.y"
+#line 215 "analyse_syntaxique.y"
+                                                        {
+		//symbole *s = chercher_table_symboles(table, $1);
+		//if(s == NULL) {
+		//	perror("Variable non déclarée");
+		//} else {
+		(yyval.inst) = creer_n_affectation(creer_n_variable((yyvsp[-3].ident)), (yyvsp[-1].exp));
+		//}
+	}
+#line 1953 "analyse_syntaxique.c"
+    break;
+
+  case 30:
+#line 226 "analyse_syntaxique.y"
+                                                                                                                   {
+		(yyval.inst) = creer_n_conditionnelle((yyvsp[-4].exp), (yyvsp[-1].l_inst), NULL, NULL);
+	}
+#line 1961 "analyse_syntaxique.c"
+    break;
+
+  case 31:
+#line 230 "analyse_syntaxique.y"
                                                                                                                                                                                {
 		// creer_n_conditionnelle(n_exp* condition, n_l_instructions* instructions_si, n_instruction* liste_sinon_si, n_l_instructions* liste_sinon);
 		(yyval.inst) = creer_n_conditionnelle((yyvsp[-8].exp), (yyvsp[-5].l_inst), NULL, (yyvsp[-1].l_inst));
 	}
-#line 1924 "analyse_syntaxique.c"
+#line 1970 "analyse_syntaxique.c"
     break;
 
-  case 30:
-#line 202 "analyse_syntaxique.y"
+  case 32:
+#line 234 "analyse_syntaxique.y"
                                                                                                                                 {
 		// creer_n_conditionnelle(n_exp* condition, n_l_instructions* instructions_si, n_instruction* liste_sinon_si, n_l_instructions* liste_sinon);
 		//n_instruction* sinon_si = creer_n_conditionnelle($10, $13, NULL, NULL);
 		(yyval.inst) = creer_n_conditionnelle((yyvsp[-5].exp), (yyvsp[-2].l_inst), (yyvsp[0].inst), NULL);
 	}
-#line 1934 "analyse_syntaxique.c"
+#line 1980 "analyse_syntaxique.c"
     break;
 
-  case 31:
-#line 207 "analyse_syntaxique.y"
+  case 33:
+#line 239 "analyse_syntaxique.y"
                                                                                                                                                                                             {
 		// creer_n_conditionnelle(n_exp* condition, n_l_instructions* instructions_si, n_instruction* liste_sinon_si, n_l_instructions* liste_sinon);
 		(yyval.inst) = creer_n_conditionnelle((yyvsp[-9].exp), (yyvsp[-6].l_inst), (yyvsp[-4].inst), (yyvsp[-1].l_inst));
 	}
-#line 1943 "analyse_syntaxique.c"
-    break;
-
-  case 32:
-#line 213 "analyse_syntaxique.y"
-                                                                                                                         {
-		(yyval.inst) = creer_n_conditionnelle((yyvsp[-4].exp), (yyvsp[-1].l_inst), NULL, NULL);
-	}
-#line 1951 "analyse_syntaxique.c"
-    break;
-
-  case 33:
-#line 216 "analyse_syntaxique.y"
-                                                                                                                                      {
-		(yyval.inst) = creer_n_conditionnelle((yyvsp[-5].exp), (yyvsp[-2].l_inst), (yyvsp[0].inst), NULL);
-	}
-#line 1959 "analyse_syntaxique.c"
+#line 1989 "analyse_syntaxique.c"
     break;
 
   case 34:
-#line 221 "analyse_syntaxique.y"
+#line 245 "analyse_syntaxique.y"
                                                                                                                          {
-		(yyval.inst) = creer_n_boucle_tantque((yyvsp[-4].exp), (yyvsp[-1].l_inst));
+		(yyval.inst) = creer_n_conditionnelle((yyvsp[-4].exp), (yyvsp[-1].l_inst), NULL, NULL);
 	}
-#line 1967 "analyse_syntaxique.c"
+#line 1997 "analyse_syntaxique.c"
     break;
 
   case 35:
-#line 226 "analyse_syntaxique.y"
-                                          {
-		(yyval.inst) = creer_n_retour((yyvsp[-1].exp));
+#line 248 "analyse_syntaxique.y"
+                                                                                                                                      {
+		(yyval.inst) = creer_n_conditionnelle((yyvsp[-5].exp), (yyvsp[-2].l_inst), (yyvsp[0].inst), NULL);
 	}
-#line 1975 "analyse_syntaxique.c"
+#line 2005 "analyse_syntaxique.c"
     break;
 
   case 36:
-#line 231 "analyse_syntaxique.y"
-                                                                                             {
-		(yyval.inst) = creer_n_appelF((yyvsp[-4].ident), (yyvsp[-2].l_exp));
+#line 253 "analyse_syntaxique.y"
+                                                                                                                         {
+		(yyval.inst) = creer_n_boucle_tantque((yyvsp[-4].exp), (yyvsp[-1].l_inst));
 	}
-#line 1983 "analyse_syntaxique.c"
+#line 2013 "analyse_syntaxique.c"
     break;
 
   case 37:
-#line 236 "analyse_syntaxique.y"
-                  {
-		(yyval.exp) = (yyvsp[0].exp);
+#line 258 "analyse_syntaxique.y"
+                                          {
+		(yyval.inst) = creer_n_retour((yyvsp[-1].exp));
 	}
-#line 1991 "analyse_syntaxique.c"
+#line 2021 "analyse_syntaxique.c"
     break;
 
   case 38:
-#line 241 "analyse_syntaxique.y"
-                  {
-		(yyval.exp) = creer_n_booleen((yyvsp[0].entier));
+#line 263 "analyse_syntaxique.y"
+                                                                                             {
+		(yyval.inst) = creer_n_appelF((yyvsp[-4].ident), (yyvsp[-2].l_exp));
 	}
-#line 1999 "analyse_syntaxique.c"
+#line 2029 "analyse_syntaxique.c"
     break;
 
   case 39:
-#line 244 "analyse_syntaxique.y"
-               {
+#line 268 "analyse_syntaxique.y"
+                  {
 		(yyval.exp) = (yyvsp[0].exp);
 	}
-#line 2007 "analyse_syntaxique.c"
+#line 2037 "analyse_syntaxique.c"
     break;
 
   case 40:
-#line 247 "analyse_syntaxique.y"
-                             {
-		(yyval.exp) = creer_n_operation_et((yyvsp[-2].exp), (yyvsp[0].exp));
+#line 273 "analyse_syntaxique.y"
+                  {
+		(yyval.exp) = creer_n_booleen((yyvsp[0].entier));
 	}
-#line 2015 "analyse_syntaxique.c"
+#line 2045 "analyse_syntaxique.c"
     break;
 
   case 41:
-#line 250 "analyse_syntaxique.y"
-                             {
-		(yyval.exp) = creer_n_operation_ou((yyvsp[-2].exp), (yyvsp[0].exp));
+#line 276 "analyse_syntaxique.y"
+               {
+		(yyval.exp) = (yyvsp[0].exp);
 	}
-#line 2023 "analyse_syntaxique.c"
+#line 2053 "analyse_syntaxique.c"
     break;
 
   case 42:
-#line 253 "analyse_syntaxique.y"
-                      {
-		(yyval.exp) = creer_n_operation_non((yyvsp[0].exp));
+#line 279 "analyse_syntaxique.y"
+                             {
+		(yyval.exp) = creer_n_operation_et((yyvsp[-2].exp), (yyvsp[0].exp));
 	}
-#line 2031 "analyse_syntaxique.c"
+#line 2061 "analyse_syntaxique.c"
     break;
 
   case 43:
-#line 259 "analyse_syntaxique.y"
-                        {
-		(yyval.exp) =creer_n_operation('+', (yyvsp[-2].exp), (yyvsp[0].exp));
+#line 282 "analyse_syntaxique.y"
+                             {
+		(yyval.exp) = creer_n_operation_ou((yyvsp[-2].exp), (yyvsp[0].exp));
 	}
-#line 2039 "analyse_syntaxique.c"
+#line 2069 "analyse_syntaxique.c"
     break;
 
   case 44:
-#line 262 "analyse_syntaxique.y"
-                         {
-		(yyval.exp) =creer_n_operation('-', (yyvsp[-2].exp) , (yyvsp[0].exp));
+#line 285 "analyse_syntaxique.y"
+                      {
+		(yyval.exp) = creer_n_operation_non((yyvsp[0].exp));
 	}
-#line 2047 "analyse_syntaxique.c"
+#line 2077 "analyse_syntaxique.c"
     break;
 
   case 45:
-#line 265 "analyse_syntaxique.y"
+#line 291 "analyse_syntaxique.y"
                         {
-		(yyval.exp) =creer_n_operation('*', (yyvsp[-2].exp) , (yyvsp[0].exp));
+		(yyval.exp) =creer_n_operation('+', (yyvsp[-2].exp), (yyvsp[0].exp));
 	}
-#line 2055 "analyse_syntaxique.c"
+#line 2085 "analyse_syntaxique.c"
     break;
 
   case 46:
-#line 268 "analyse_syntaxique.y"
-                          {
-		(yyval.exp) =creer_n_operation('/', (yyvsp[-2].exp) , (yyvsp[0].exp));
+#line 294 "analyse_syntaxique.y"
+                         {
+		(yyval.exp) =creer_n_operation('-', (yyvsp[-2].exp) , (yyvsp[0].exp));
 	}
-#line 2063 "analyse_syntaxique.c"
+#line 2093 "analyse_syntaxique.c"
     break;
 
   case 47:
-#line 271 "analyse_syntaxique.y"
-                          {
-		(yyval.exp) =creer_n_operation('%', (yyvsp[-2].exp) , (yyvsp[0].exp));
+#line 297 "analyse_syntaxique.y"
+                        {
+		(yyval.exp) =creer_n_operation('*', (yyvsp[-2].exp) , (yyvsp[0].exp));
 	}
-#line 2071 "analyse_syntaxique.c"
+#line 2101 "analyse_syntaxique.c"
     break;
 
   case 48:
-#line 274 "analyse_syntaxique.y"
-                                 {
-		(yyval.exp) =creer_n_operation('-', creer_n_entier(0), (yyvsp[0].exp));
+#line 300 "analyse_syntaxique.y"
+                          {
+		(yyval.exp) =creer_n_operation('/', (yyvsp[-2].exp) , (yyvsp[0].exp));
 	}
-#line 2079 "analyse_syntaxique.c"
+#line 2109 "analyse_syntaxique.c"
     break;
 
   case 49:
-#line 277 "analyse_syntaxique.y"
-                                                          {
-		(yyval.exp) = (yyvsp[-1].exp);
+#line 303 "analyse_syntaxique.y"
+                          {
+		(yyval.exp) =creer_n_operation('%', (yyvsp[-2].exp) , (yyvsp[0].exp));
 	}
-#line 2087 "analyse_syntaxique.c"
+#line 2117 "analyse_syntaxique.c"
     break;
 
   case 50:
-#line 280 "analyse_syntaxique.y"
-                              {
-		(yyval.exp) = creer_n_operation('>', (yyvsp[-2].exp), (yyvsp[0].exp));
+#line 306 "analyse_syntaxique.y"
+                                 {
+		(yyval.exp) =creer_n_operation('-', creer_n_entier(0), (yyvsp[0].exp));
 	}
-#line 2095 "analyse_syntaxique.c"
+#line 2125 "analyse_syntaxique.c"
     break;
 
   case 51:
-#line 283 "analyse_syntaxique.y"
-                                   {
-		(yyval.exp) = creer_n_operation_supeg((yyvsp[-2].exp), (yyvsp[0].exp));
+#line 309 "analyse_syntaxique.y"
+                                                          {
+		(yyval.exp) = (yyvsp[-1].exp);
 	}
-#line 2103 "analyse_syntaxique.c"
+#line 2133 "analyse_syntaxique.c"
     break;
 
   case 52:
-#line 286 "analyse_syntaxique.y"
+#line 312 "analyse_syntaxique.y"
                               {
-		(yyval.exp) = creer_n_operation('<', (yyvsp[-2].exp), (yyvsp[0].exp));
+		(yyval.exp) = creer_n_operation('>', (yyvsp[-2].exp), (yyvsp[0].exp));
 	}
-#line 2111 "analyse_syntaxique.c"
+#line 2141 "analyse_syntaxique.c"
     break;
 
   case 53:
-#line 289 "analyse_syntaxique.y"
+#line 315 "analyse_syntaxique.y"
                                    {
-		(yyval.exp) = creer_n_operation_infeg((yyvsp[-2].exp), (yyvsp[0].exp));
+		(yyval.exp) = creer_n_operation_supeg((yyvsp[-2].exp), (yyvsp[0].exp));
 	}
-#line 2119 "analyse_syntaxique.c"
+#line 2149 "analyse_syntaxique.c"
     break;
 
   case 54:
-#line 292 "analyse_syntaxique.y"
-                         {
-		(yyval.exp) = creer_n_operation_egal((yyvsp[-2].exp), (yyvsp[0].exp));
+#line 318 "analyse_syntaxique.y"
+                              {
+		(yyval.exp) = creer_n_operation('<', (yyvsp[-2].exp), (yyvsp[0].exp));
 	}
-#line 2127 "analyse_syntaxique.c"
+#line 2157 "analyse_syntaxique.c"
     break;
 
   case 55:
-#line 295 "analyse_syntaxique.y"
-                              {
-		(yyval.exp) = creer_n_operation_diff((yyvsp[-2].exp), (yyvsp[0].exp));
+#line 321 "analyse_syntaxique.y"
+                                   {
+		(yyval.exp) = creer_n_operation_infeg((yyvsp[-2].exp), (yyvsp[0].exp));
 	}
-#line 2135 "analyse_syntaxique.c"
+#line 2165 "analyse_syntaxique.c"
     break;
 
   case 56:
-#line 298 "analyse_syntaxique.y"
-                  {
-		(yyval.exp) = (yyvsp[0].exp);
+#line 324 "analyse_syntaxique.y"
+                         {
+		(yyval.exp) = creer_n_operation_egal((yyvsp[-2].exp), (yyvsp[0].exp));
 	}
-#line 2143 "analyse_syntaxique.c"
+#line 2173 "analyse_syntaxique.c"
     break;
 
   case 57:
-#line 307 "analyse_syntaxique.y"
-                  {
-		(yyval.l_exp) = creer_n_l_exp((yyvsp[0].exp), NULL);
+#line 327 "analyse_syntaxique.y"
+                              {
+		(yyval.exp) = creer_n_operation_diff((yyvsp[-2].exp), (yyvsp[0].exp));
 	}
-#line 2151 "analyse_syntaxique.c"
+#line 2181 "analyse_syntaxique.c"
     break;
 
   case 58:
-#line 310 "analyse_syntaxique.y"
-                                           {
-		(yyval.l_exp) = creer_n_l_exp((yyvsp[-2].exp), (yyvsp[0].l_exp));
+#line 330 "analyse_syntaxique.y"
+                  {
+		(yyval.exp) = (yyvsp[0].exp);
 	}
-#line 2159 "analyse_syntaxique.c"
+#line 2189 "analyse_syntaxique.c"
     break;
 
   case 59:
-#line 315 "analyse_syntaxique.y"
-                      {
-		(yyval.exp) = (n_exp*) creer_n_variable((yyvsp[0].ident));
+#line 339 "analyse_syntaxique.y"
+                  {
+		(yyval.l_exp) = creer_n_l_exp((yyvsp[0].exp), NULL);
 	}
-#line 2167 "analyse_syntaxique.c"
+#line 2197 "analyse_syntaxique.c"
     break;
 
   case 60:
-#line 318 "analyse_syntaxique.y"
-                 {
-		(yyval.exp) = creer_n_entier((yyvsp[0].entier));
+#line 342 "analyse_syntaxique.y"
+                                           {
+		(yyval.l_exp) = creer_n_l_exp((yyvsp[-2].exp), (yyvsp[0].l_exp));
 	}
-#line 2175 "analyse_syntaxique.c"
+#line 2205 "analyse_syntaxique.c"
     break;
 
   case 61:
-#line 325 "analyse_syntaxique.y"
-                                                       {
-		(yyval.exp) = creer_n_lire();
+#line 347 "analyse_syntaxique.y"
+                      {
+		/*if (chercher_table_symboles(table,$1) == NULL) {
+			perror("Variable non déclarée");
+		} else {*/
+		(yyval.exp) = (n_exp*) creer_n_variable((yyvsp[0].ident));
+		//}
 	}
-#line 2183 "analyse_syntaxique.c"
+#line 2217 "analyse_syntaxique.c"
     break;
 
   case 62:
-#line 328 "analyse_syntaxique.y"
-                                                                               {
-		(yyval.exp) = (n_exp*) creer_n_appel((yyvsp[-3].ident), (yyvsp[-1].l_exp));
+#line 354 "analyse_syntaxique.y"
+                 {
+		(yyval.exp) = creer_n_entier((yyvsp[0].entier));
 	}
-#line 2191 "analyse_syntaxique.c"
+#line 2225 "analyse_syntaxique.c"
     break;
 
   case 63:
-#line 331 "analyse_syntaxique.y"
-                                                              {
-		(yyval.exp) = (n_exp*) creer_n_appel((yyvsp[-2].ident), NULL);
+#line 361 "analyse_syntaxique.y"
+                                                       {
+		(yyval.exp) = creer_n_lire();
 	}
-#line 2199 "analyse_syntaxique.c"
+#line 2233 "analyse_syntaxique.c"
+    break;
+
+  case 64:
+#line 364 "analyse_syntaxique.y"
+                                                                               {
+		/*int cpt = 0;
+		while ($3 != NULL) {
+			cpt++;
+			$3 = $3->suivant;
+		}
+		symbole *s = chercher_table_symboles(table,$1);
+		if (s->estFonction == 1 && s->nbParametres == cpt) { */
+		(yyval.exp) = (n_exp*) creer_n_appel((yyvsp[-3].ident), (yyvsp[-1].l_exp));
+		/*} else {
+			perror("Nombre de paramètres incorrect");
+			exit(1);
+		}*/
+	}
+#line 2252 "analyse_syntaxique.c"
+    break;
+
+  case 65:
+#line 378 "analyse_syntaxique.y"
+                                                              {
+		/*symbole *s = chercher_table_symboles(table,$1);
+		if (s == NULL) {
+			perror("Fonction non déclarée");
+		} else if (s->estFonction == 1 && s->nbParametres == 0) { */
+		(yyval.exp) = (n_exp*) creer_n_appel((yyvsp[-2].ident), NULL);
+		/*} else {
+			perror("Nombre de paramètres incorrect");
+		} */
+	}
+#line 2267 "analyse_syntaxique.c"
     break;
 
 
-#line 2203 "analyse_syntaxique.c"
+#line 2271 "analyse_syntaxique.c"
 
         default: break;
       }
@@ -2443,7 +2511,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 334 "analyse_syntaxique.y"
+#line 388 "analyse_syntaxique.y"
 
 
 int yyerror(const char *s) {

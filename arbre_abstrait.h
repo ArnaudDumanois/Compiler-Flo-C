@@ -6,7 +6,7 @@
   * l -> liste
   * exp -> expression (arithmétique)
 */
-#define TAILLE_TABLE_SYMBOLES 100
+#define TAILLE_TABLE_SYMBOLES 1000000
 
 typedef struct n_programme n_programme; /* Noeud du type programme */
 typedef struct n_l_instructions n_l_instructions; /* Noeud du type liste d'instructions */
@@ -29,9 +29,9 @@ typedef struct n_l_fonctions n_l_fonctions; /* Noeud du type liste de fonctions 
 typedef struct n_fonction n_fonction; /* Noeud du type fonction */
 typedef struct n_l_parametres n_l_parametres; /* Noeud du type liste de parametres */
 typedef struct n_parametre n_parametre; /* Noeud du type parametre */
-typedef struct symbole symbole; /* Noeud du type symbole */
-typedef struct table_symboles table_symboles; /* Noeud du type table des symboles */
-typedef struct pile_table_symboles pile_table_symboles; /* Noeud du type pile de tables des symboles */
+// typedef struct symbole symbole; /* Noeud du type symbole */
+// typedef struct table_symboles table_symboles; /* Noeud du type table des symboles */
+// typedef struct pile_table_symboles pile_table_symboles; /* Noeud du type pile de tables des symboles */
 
 struct n_programme{   // pour le moment un programme est juste une liste d'instructions. Il faudra ajouter une liste de définitions de fonctions.
 	n_l_instructions* instructions;
@@ -149,7 +149,7 @@ struct n_parametre{
     type t_type;
     char* nom;
 };
-
+/*
 struct symbole{
     type type;
     char* nom;
@@ -167,7 +167,7 @@ struct pile_table_symboles{
     table_symboles* base;
     int taille;
 };
-
+*/
 
 void afficher_n_programme(n_programme* prog,int indent);
 void afficher_n_l_instructions(n_l_instructions* instructions ,int indent);

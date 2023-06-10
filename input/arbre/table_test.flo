@@ -1,0 +1,5 @@
+entier f() {
+    ecrire(0);
+    g(a);
+}
+ecrire(2);
