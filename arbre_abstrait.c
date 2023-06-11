@@ -317,7 +317,6 @@ n_exp* creer_n_entier(int valeur){
   n_exp* n = malloc(sizeof(n_exp));
   n->type_exp = i_entier;
   n->u.valeur = valeur;
-  n->u.booleen = "entier";
   return n;
 }
 
