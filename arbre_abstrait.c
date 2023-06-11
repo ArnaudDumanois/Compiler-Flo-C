@@ -317,6 +317,7 @@ n_exp* creer_n_entier(int valeur){
   n_exp* n = malloc(sizeof(n_exp));
   n->type_exp = i_entier;
   n->u.valeur = valeur;
+  n->u.booleen = "entier";
   return n;
 }
 
@@ -422,6 +423,7 @@ n_exp *creer_n_booleen(int valeur) {
         exit(1);
     }
     n->type_exp = i_booleen;
+    n->u.booleen = "booleen";
     n->u.valeur = valeur;
     if (valeur != 0) {
         n->u.valeur = 1;

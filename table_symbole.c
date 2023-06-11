@@ -137,6 +137,8 @@ symbole *ajouter_table_symboles_fonction(table_symboles* table,  type type, char
     return nouveauSymbole;
 }
 
+
+
 int nombre_parametres(n_l_parametres *listeParametres) {
     int nbParametres = 0;
     while (listeParametres != NULL) {
@@ -145,3 +147,13 @@ int nombre_parametres(n_l_parametres *listeParametres) {
     }
     return nbParametres;
 }
+
+int nombre_parametres_list_type(n_l_exp *listeParametres) {
+    int nbParametres = 0;
+    while (listeParametres != NULL) {
+        nbParametres++;
+        listeParametres = listeParametres->suivant;
+    }
+    return nbParametres;
+}
+

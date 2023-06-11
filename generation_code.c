@@ -69,15 +69,35 @@ void nasm_liste_fonctions(n_l_fonctions *n) {
     do {
         if (n->fonction != NULL){
             nasm_fonction(n->fonction);
+            imbrication--;
         }
         n = n->suivant;
     } while(n != NULL );
 }
 
 void nasm_fonction(n_fonction *n) {
+    imbrication++;
+    adresse += 4*nombre_parametres(n->parametres);
+    ajouter_table_symboles_fonction(table, n->t_type, n->nom, adresse, imbrication, nombre_parametres(n->parametres),
+                                    creer_list_type(n->parametres));
+        while (n->parametres != NULL){
+        if (n->parametres->parametre != NULL){
+            ajouter_table_symboles(table, n->parametres->parametre->t_type, n->parametres->parametre->nom, adresse, imbrication);
+            adresse += 4;
+        }
+        n->parametres = n->parametres->suivant;
+    }
     printifm("_%s:\n", n->nom);
+    char nm_params[10];
+    sprintf(nm_params, "%d", adresse);
+    if (nombre_parametres(n->parametres) > 0){
+        nasm_commande("push", "ebp", NULL, NULL, "on empile ebp");
+        nasm_commande("mov", "ebp", "esp", NULL, "on met esp dans ebp");
+        nasm_commande("sub", "esp", nm_params, NULL, "on réserve de la place pour les paramètres");
+    }
     //nasm_commande("push", "ebp", NULL, NULL, "on empile ebp");
-    nasm_commande("mov", "ebp", "esp", NULL, "on met esp dans ebp");
+    //nasm_commande("mov", "ebp", "esp", NULL, "on met esp dans ebp");
+    //nasm_commande("sub", "esp", nm_params, NULL, "on réserve de la place pour les paramètres");
     nasm_liste_instructions(n->instructions);
 }
 
@@ -97,8 +117,8 @@ void nasm_instruction(n_instruction* n) {
         nasm_commande("call", "iprintLF", NULL, NULL, NULL); //on envoie la valeur d'eax sur la sortie standard
     } else if (n->type_instruction == i_declaration) {
         if (n->u.declaration->t_type == t_entier) {
-            adresse += 4;
             ajouter_table_symboles(table, t_entier, n->u.declaration->variable->nom, adresse, imbrication);
+            adresse += 4;
             nasm_commande("sub", "esp", "4", NULL, "on réserve 4 octets pour la variable");
             nasm_commande("mov", "dword [esp]", "0", NULL, "on initialise la variable à 0");
         } else if (n->u.declaration->t_type == t_booleen) {
@@ -127,18 +147,12 @@ void nasm_instruction(n_instruction* n) {
         }
     } else if (n->type_instruction == i_decla_aff) {
         if (n->u.decla_aff->declaration->u.declaration->t_type == t_entier && n->u.decla_aff->affectation->u.affectation->variable->t_type == t_entier) {
-            //ajouter_table_symboles(table, t_entier, n->u.decla_aff->declaration->u.declaration->variable->nom, adresse, imbrication);
-            //adresse += 4;
             nasm_instruction(n->u.decla_aff->declaration);
             nasm_instruction(n->u.decla_aff->affectation);
         } else if (n->u.decla_aff->declaration->u.declaration->t_type == t_booleen&& n->u.decla_aff->affectation->u.affectation->variable->t_type == t_booleen) {
-            //ajouter_table_symboles(table, t_booleen, n->u.decla_aff->declaration->u.declaration->variable->nom, adresse, imbrication);
-            //adresse += 4;
             nasm_instruction(n->u.decla_aff->declaration);
             nasm_instruction(n->u.decla_aff->affectation);
         }
-
-
 
     } else if (n->type_instruction == i_conditionnelle) {
         nasm_exp(n->u.conditionnelle->condition);
@@ -248,17 +262,35 @@ void nasm_exp(n_exp* n){
     } else if (n->type_exp == i_appel) {
         char buffer[10];
         sprintf(buffer, "_%s", n->u.appel->nom);
-        nasm_commande("call", buffer, NULL, NULL, "on appelle la fonction");
-        nasm_commande("push", "eax", NULL, NULL, "on empile le résultat");
+        if (n->u.appel->arguments != NULL) {
+            if (chercher_table_symboles(table, n->u.appel->nom) != NULL) {
+                nasm_commande("mov", "ebp", "esp", NULL, "on met esp dans ebp");
+            } else {
+                perror("Erreur : la fonction n'existe pas");
+            }
+        }
+        if (chercher_table_symboles(table, n->u.appel->nom) != NULL) {
+            nasm_commande("push", "ebp", NULL, NULL, "on sauvegarde ebp");
+            nasm_commande("call", buffer, NULL, NULL, "on appelle la fonction");
+            nasm_commande("push", "eax", NULL, NULL, "on empile le résultat");
+        } else {
+            perror("Erreur : la fonction n'existe pas");
+        }
     } else if (n->type_exp == i_variable) {
         if (chercher_table_symboles(table, n->u.variable->nom) != NULL) {
             char buffer[10];
-            sprintf(buffer, "%d", chercher_table_symboles(table, n->u.variable->nom)->adresse);
-            nasm_commande("push", "ebp", NULL, NULL, "on sauvegarde ebp");
-            nasm_commande("mov", "ebp", buffer, NULL, "on met l'adresse de la variable dans ebp");
-            nasm_commande("mov", "eax", "(ebp)", NULL, "on met la valeur de la variable dans eax");
-            nasm_commande("pop", "ebp", NULL, NULL, "on restaure ebp");
-            nasm_commande("push", "eax", NULL, NULL, "on empile le résultat");
+            // si l'adresse de la variable est superieur à ebp
+            if (chercher_table_symboles(table, n->u.variable->nom)->adresse > 0) {
+                sprintf(buffer, "[ebp + %d]", chercher_table_symboles(table, n->u.variable->nom)->adresse);
+                nasm_commande("mov", "eax", buffer, NULL, "on met la valeur de la variable dans eax");
+                nasm_commande("push", "eax", NULL, NULL, "on empile la valeur de la variable");
+            } else {
+                sprintf(buffer, "[ebp%d]", chercher_table_symboles(table, n->u.variable->nom)->adresse);
+                //nasm_commande("push", buffer, NULL, NULL, "on empile l'adresse de la variable");
+                nasm_commande("mov", "eax", buffer, NULL, "on met la valeur de la variable dans eax");
+                nasm_commande("push", "eax", NULL, NULL, "on empile la valeur de la variable");
+            }
+
         } else {
             fprintf(stderr, "erreur de compilation : variable %s non déclarée\n", n->u.variable->nom);
             exit(1);

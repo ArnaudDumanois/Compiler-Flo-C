@@ -42,12 +42,14 @@ struct list_type{
 symbole* creer_symbole(type type, char* nom, int adresse, int imbrication);
 
 table_symboles* creer_table_symboles();
-symbole *ajouter_table_symboles(table_symboles* table,  type type, char* nom, int adresse, int imbrication);
+symbole *ajouter_table_symboles(table_symboles* table,  type type, char* nom, int adresse, int imbrication  );
 symbole *chercher_table_symboles(table_symboles* table, char* nom);
 
 int nombre_parametres(n_l_parametres *listeParametres);
+int nombre_parametres_list_type(n_l_exp *listeParametres);
 list_type* creer_list_type(n_l_parametres *listeParametres);
 symbole *ajouter_table_symboles_fonction(table_symboles* table,  type type, char* nom, int adresse, int imbrication, int nbParametres, list_type* listeParametres);
+
 
 void afficher_table_symboles(table_symboles* table);
 

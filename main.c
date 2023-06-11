@@ -9,8 +9,6 @@
 #include "table_symbole.h"
 
 
-
-
 /* 
 * Variable globale qui va indiquer à l'analyseur lexical quel fichier source lire.
 * Cette variable est défini dans analyse_lexicale.c (qui est le resultat de la compilation avec flex de analyse_lexicale.l)
