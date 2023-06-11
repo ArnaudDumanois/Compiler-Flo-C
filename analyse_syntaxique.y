@@ -11,8 +11,6 @@ int yylex();
 int yyerror(const char *s);
 n_programme* arbre_abstrait;
 //table_symboles* table;
-int adresse;
-int imbrication;
 %}
 
 %union {
@@ -69,7 +67,7 @@ int imbrication;
 %type <inst> affectation
 %type <inst> declarationAffectation
 %type <inst> conditionnelle
-%type <inst> listeSinonSi
+%type <l_inst> listeSinonSi
 %type <inst> boucleTanque
 %type <inst> retourner
 %type <inst> appelFonction
@@ -149,7 +147,7 @@ listeInstructions
 		$$ = creer_n_l_instructions($1 ,NULL);
 	}
 	| instruction listeInstructions {
-		$$ =creer_n_l_instructions($1 ,$2);
+		$$ = creer_n_l_instructions($1 ,$2);
 	}
 
 instruction
@@ -228,25 +226,25 @@ conditionnelle
 	}
 
 	| SI PARENTHESE_OUVRANTE exprAll PARENTHESE_FERMANTE ACCOLADE_OUVRANTE listeInstructions ACCOLADE_FERMANTE SINON ACCOLADE_OUVRANTE listeInstructions ACCOLADE_FERMANTE {
-		// creer_n_conditionnelle(n_exp* condition, n_l_instructions* instructions_si, n_instruction* liste_sinon_si, n_l_instructions* liste_sinon);
+		// creer_n_conditionnelle(n_exp* condition, n_l_instructions* instructions_si, n_l_instructions* liste_sinon_si, n_l_instructions* liste_sinon);
 		$$ = creer_n_conditionnelle($3, $6, NULL, $10);
 	}
 	| SI PARENTHESE_OUVRANTE exprAll PARENTHESE_FERMANTE ACCOLADE_OUVRANTE listeInstructions ACCOLADE_FERMANTE listeSinonSi {
-		// creer_n_conditionnelle(n_exp* condition, n_l_instructions* instructions_si, n_instruction* liste_sinon_si, n_l_instructions* liste_sinon);
+		// creer_n_conditionnelle(n_exp* condition, n_l_instructions* instructions_si, n_l_instructions* liste_sinon_si, n_l_instructions* liste_sinon);
 		//n_instruction* sinon_si = creer_n_conditionnelle($10, $13, NULL, NULL);
 		$$ = creer_n_conditionnelle($3, $6, $8, NULL);
 	}
 	| SI PARENTHESE_OUVRANTE exprAll PARENTHESE_FERMANTE ACCOLADE_OUVRANTE listeInstructions ACCOLADE_FERMANTE listeSinonSi SINON ACCOLADE_OUVRANTE listeInstructions ACCOLADE_FERMANTE {
-		// creer_n_conditionnelle(n_exp* condition, n_l_instructions* instructions_si, n_instruction* liste_sinon_si, n_l_instructions* liste_sinon);
+		// creer_n_conditionnelle(n_exp* condition, n_l_instructions* instructions_si, n_l_instructions* liste_sinon_si, n_l_instructions* liste_sinon);
 		$$ = creer_n_conditionnelle($3, $6, $8, $11);
 	}
 
 listeSinonSi
 	: SINON_SI PARENTHESE_OUVRANTE exprAll PARENTHESE_FERMANTE ACCOLADE_OUVRANTE listeInstructions ACCOLADE_FERMANTE {
-		$$ = creer_n_conditionnelle($3, $6, NULL, NULL);
+		$$ = creer_n_l_instructions(creer_n_conditionnelle($3, $6, NULL, NULL), NULL);
 	}
 	| SINON_SI PARENTHESE_OUVRANTE exprAll PARENTHESE_FERMANTE ACCOLADE_OUVRANTE listeInstructions ACCOLADE_FERMANTE listeSinonSi {
-		$$ = creer_n_conditionnelle($3, $6, $8, NULL);
+		$$ = creer_n_l_instructions(creer_n_conditionnelle($3, $6, $8, NULL), $8);
 	}
 
 boucleTanque

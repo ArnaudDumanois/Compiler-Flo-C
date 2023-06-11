@@ -10,8 +10,10 @@
 #define printifm(format, ...) if(afficher_nasm){ printf(format, __VA_ARGS__); }
 
 int afficher_nasm = 1;
-int label_count = 0;
-int fin_si_count = 0;
+int label_count_endif = 0;
+int label_count_else = 0;
+int label_count_elif = 0;
+int label_count_while = 0;
 int adresse = 0;
 int imbrication = 0;
 table_symboles *table;
@@ -155,81 +157,91 @@ void nasm_instruction(n_instruction* n) {
         }
 
     } else if (n->type_instruction == i_conditionnelle) {
-        nasm_exp(n->u.conditionnelle->condition);
-        nasm_commande("pop", "eax", NULL, NULL, NULL);
-        nasm_commande("cmp", "eax", "1", NULL, " on verifie la condition");
-        // on crée les labels pour le si et le sinon et la fin
-        char label_if[10];
-        sprintf(label_if, "if%d", label_count);
-        char label_else[10];
-        sprintf(label_else, "else%d", label_count);
-        char label_elif[10];
-        sprintf(label_elif, "elif%d", label_count);
-        char label_endif[10];
-        sprintf(label_endif, "endif%d", fin_si_count);
 
-        if (n->u.conditionnelle->liste_sinon_si != NULL) {
-            nasm_commande("je", label_if, NULL, NULL, "on saute au si");
-            nasm_commande("jmp", label_endif, NULL, NULL, "on saute au prochain endif");
-            sprintf(label_if, "if%d:", label_count);
-            nasm_commande(label_if, NULL, NULL, NULL, "on entre dans le si");
-            nasm_liste_instructions(n->u.conditionnelle->instructions_si);
-            sprintf(label_else, "else");
-            nasm_commande("jmp", label_else, NULL, NULL, "on saute au sinon");
-            sprintf(label_endif, "endif%d:", label_count);
-            nasm_commande(label_endif, NULL, NULL, NULL, "on entre dans le endif");
-            //sprintf(label_else, "else%d:", label_count);
-            //nasm_commande(label_else, NULL, NULL, NULL, " on entre dans le sinon");
-            label_count++;
-            fin_si_count++;
-            nasm_instruction(n->u.conditionnelle->liste_sinon_si);
-            //fin_si_count++;
-            sprintf(label_else, "else:");
-            nasm_commande(label_else, NULL, NULL, NULL, " on entre dans le sinon");
-            /*if (n->u.conditionnelle->liste_sinon != NULL) {
-                nasm_commande(label_else, NULL, NULL, NULL, " on entre dans le sinon");
+        // on crée les labels pour le si et le sinon et la fin
+        char label_else[12];
+        char label_elif[12];
+        char label_endif[12];
+
+        if(n->u.conditionnelle->instructions_si != NULL){
+            nasm_exp(n->u.conditionnelle->condition);
+            nasm_commande("pop", "eax", NULL, NULL, NULL);
+            nasm_commande("cmp", "eax", "1", NULL, " on verifie la condition");
+
+            if(n->u.conditionnelle->liste_sinon_si == NULL){
+                if(n->u.conditionnelle->liste_sinon == NULL){
+                    sprintf(label_endif, "endif%d", label_count_endif);
+                    nasm_commande("jne", label_endif, NULL, NULL, "on saute au prochain endif");
+                    nasm_liste_instructions(n->u.conditionnelle->instructions_si);
+                }
+                else {
+                    sprintf(label_else, "else%d", label_count_else);
+                    nasm_commande("jne", label_else, NULL, NULL, "on saute au prochain sinon");
+                    nasm_liste_instructions(n->u.conditionnelle->instructions_si);
+                    sprintf(label_endif, "endif%d", label_count_endif);
+                    nasm_commande("jmp", label_endif, NULL, NULL, "on saute au prochain endif");
+                }
+            }
+            else {
+                sprintf(label_elif, "elif%d", label_count_elif);
+                nasm_commande("jne", label_elif, NULL, NULL, "on saute au prochain sinon si");
+                nasm_liste_instructions(n->u.conditionnelle->instructions_si);
+                sprintf(label_endif, "endif%d", label_count_endif);
+                nasm_commande("jmp", label_endif, NULL, NULL, "on saute au prochain endif");
+
+                while(n->u.conditionnelle->liste_sinon_si != NULL &&
+                                            n->u.conditionnelle->liste_sinon_si->instruction->u.conditionnelle->instructions_si != NULL){
+                    sprintf(label_elif, "elif%d:", label_count_elif++);
+                    nasm_commande(label_elif, NULL, NULL, NULL, "on pose le label du prochain sinon si");
+
+                    nasm_exp(n->u.conditionnelle->liste_sinon_si->instruction->u.conditionnelle->condition);
+                    nasm_commande("pop", "eax", NULL, NULL, NULL);
+                    nasm_commande("cmp", "eax", "1", NULL, " on verifie la condition");
+
+                    if(n->u.conditionnelle->liste_sinon_si->instructions != NULL){ // si le prochain est un elif
+                        sprintf(label_elif, "elif%d", label_count_elif);
+                        nasm_commande("jne", label_elif, NULL, NULL, "on saute au prochain sinon si");
+                    }
+                    else if(n->u.conditionnelle->liste_sinon) {
+                        sprintf(label_else, "else%d", label_count_else);
+                        nasm_commande("jne", label_else, NULL, NULL, "on saute à la fin");
+                    }
+                    else {
+                        sprintf(label_endif, "endif%d", label_count_endif);
+                        nasm_commande("jne", label_endif, NULL, NULL, "on saute au prochain endif");
+                    }
+                    nasm_liste_instructions(n->u.conditionnelle->liste_sinon_si->instruction->u.conditionnelle->instructions_si);
+                    sprintf(label_endif, "endif%d", label_count_endif);
+                    nasm_commande("jmp", label_endif, NULL, NULL, "on saute au prochain endif");
+
+                    n->u.conditionnelle->liste_sinon_si = n->u.conditionnelle->liste_sinon_si->instructions;
+                }
+            }
+            if(n->u.conditionnelle->liste_sinon){
+                sprintf(label_else, "else%d:", label_count_else++);
+                nasm_commande(label_else, NULL, NULL, NULL, "on pose le label du prochain sinon");
                 nasm_liste_instructions(n->u.conditionnelle->liste_sinon);
             }
-            */
-
-            //sprintf(label_endif, "endif%d:", fin_si_count);
-            //nasm_commande(label_endif, NULL, NULL, NULL, "on saute à la fin");
-        } else if (n->u.conditionnelle->liste_sinon != NULL) {
-            nasm_commande("je", label_if, NULL, NULL, "on saute au si");
-            nasm_commande("jmp", label_else, NULL, NULL, "on saute au sinon");
-            sprintf(label_if, "if%d:", label_count);
-            nasm_commande(label_if, NULL, NULL, NULL, "on entre dans le si");
-            nasm_liste_instructions(n->u.conditionnelle->instructions_si);
-            nasm_commande("jmp", label_endif, NULL, NULL, "on saute à la fin");
-            sprintf(label_else, "else%d:", label_count);
-            nasm_commande(label_else, NULL, NULL, NULL, " on entre dans le sinon");
-            nasm_liste_instructions(n->u.conditionnelle->liste_sinon);
-        } else {
-            nasm_commande("je", label_if, NULL, NULL, "on saute au si");
-            nasm_commande("jmp", label_endif, NULL, NULL, "on saute à la fin");
-            sprintf(label_if, "if%d:", label_count);
-            nasm_commande(label_if, NULL, NULL, NULL, "on entre dans le si");
-            nasm_liste_instructions(n->u.conditionnelle->instructions_si);
-            sprintf(label_endif, "endif%d:", fin_si_count);
-            nasm_commande(label_endif, NULL, NULL, NULL, "on saute à la fin");
+            sprintf(label_endif, "endif%d:", label_count_endif++);
+            nasm_commande(label_endif,NULL, NULL, NULL, "on saute à la fin");
         }
     } else if (n->type_instruction == i_boucle_tantque) {
         char label_while[15];
-        sprintf(label_while, "while%d", label_count);
+        sprintf(label_while, "while%d", label_count_while);
         char label_endwhile[15];
-        sprintf(label_endwhile, "endwhile%d", label_count);
-        sprintf(label_while, "while%d:", label_count);
+        sprintf(label_endwhile, "endwhile%d", label_count_while);
+        sprintf(label_while, "while%d:", label_count_while);
         nasm_commande(label_while, NULL, NULL, NULL, "on entre dans le while");
         nasm_exp(n->u.boucle_tantque->condition);
         nasm_commande("pop", "eax", NULL, NULL, NULL);
         nasm_commande("cmp", "eax", "0", NULL, " on verifie la condition");
         nasm_commande("je", label_endwhile, NULL, NULL, "on saute à la fin");
         nasm_liste_instructions(n->u.boucle_tantque->instructions);
-        sprintf(label_while, "while%d", label_count);
+        sprintf(label_while, "while%d", label_count_while);
         nasm_commande("jmp", label_while, NULL, NULL, "on saute au while");
-        sprintf(label_endwhile, "endwhile%d:", label_count);
+        sprintf(label_endwhile, "endwhile%d:", label_count_while);
         nasm_commande(label_endwhile, NULL, NULL, NULL, "on sort du while");
-        label_count++;
+        label_count_while++;
     } else if (n->type_instruction == i_retour) {
         nasm_exp(n->u.retour->exp);
         nasm_commande("pop", "eax", NULL, NULL, NULL);

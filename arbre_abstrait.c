@@ -162,7 +162,7 @@ void afficher_n_instruction(n_instruction* instruction ,int indent){
         afficher("</alors>",indent+1);
         if (instruction->u.conditionnelle->liste_sinon_si != NULL){
             afficher("<sinon_si>",indent+1);
-            afficher_n_instruction(instruction->u.conditionnelle->liste_sinon_si,indent+1);
+            afficher_n_l_instructions(instruction->u.conditionnelle->liste_sinon_si,indent+1);
             afficher("</sinon_si>",indent+1);
         }
         if (instruction->u.conditionnelle->liste_sinon){
@@ -317,6 +317,7 @@ n_exp* creer_n_entier(int valeur){
   n_exp* n = malloc(sizeof(n_exp));
   n->type_exp = i_entier;
   n->u.valeur = valeur;
+  //n->u.booleen = "entier";
   return n;
 }
 
@@ -422,7 +423,7 @@ n_exp *creer_n_booleen(int valeur) {
         exit(1);
     }
     n->type_exp = i_booleen;
-    n->u.booleen = "booleen";
+    //n->u.booleen = "booleen";
     n->u.valeur = valeur;
     if (valeur != 0) {
         n->u.valeur = 1;
@@ -512,7 +513,7 @@ n_instruction* creer_n_decla_aff(n_instruction *declaration, n_instruction *affe
     return n;
 }
 
-n_instruction* creer_n_conditionnelle(n_exp* condition, n_l_instructions* instructions_si, n_instruction* liste_sinon_si, n_l_instructions* liste_sinon) {
+n_instruction* creer_n_conditionnelle(n_exp* condition, n_l_instructions* instructions_si, n_l_instructions* liste_sinon_si, n_l_instructions* liste_sinon) {
     n_instruction *n = malloc(sizeof(n_instruction));
     if (n == NULL) {
         fprintf(stderr, "Erreur d'allocation mémoire");

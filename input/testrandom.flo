@@ -1,4 +1,26 @@
-entier a = 1;
-entier b;
-booleen c;
-ecrire(a);
+si(Faux){
+    ecrire(3);
+} sinon si(Faux){
+    ecrire(5);
+} sinon {
+    ecrire(28);
+}
+
+si(Vrai){
+    ecrire(9);
+} sinon {
+    ecrire(0);
+}
+ecrire(2);
+
+si(Faux){
+    ecrire(3);
+} sinon si(Faux){
+    ecrire(5);
+} sinon si(Vrai){
+    ecrire(32);
+} sinon si(Vrai){
+    ecrire(33);
+} sinon {
+    ecrire(3);
+}

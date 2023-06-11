@@ -115,7 +115,7 @@ struct n_decla_aff{
 struct n_conditionnelle{
     n_exp* condition;
     n_l_instructions* instructions_si;
-    n_instruction* liste_sinon_si;
+    n_l_instructions* liste_sinon_si;
     n_l_instructions* liste_sinon;
 };
 
@@ -211,7 +211,7 @@ n_exp* creer_n_operation_non(n_exp* exp1);
 n_instruction* creer_n_declaration(n_exp* variable, type t_type);
 n_instruction* creer_n_affectation(n_exp* variable, n_exp* exp);
 n_instruction* creer_n_decla_aff(n_instruction *declaration, n_instruction *affectation);
-n_instruction* creer_n_conditionnelle(n_exp* condition, n_l_instructions* instructions_si, n_instruction* liste_sinon_si, n_l_instructions* liste_sinon);
+n_instruction* creer_n_conditionnelle(n_exp* condition, n_l_instructions* instructions_si, n_l_instructions* liste_sinon_si, n_l_instructions* liste_sinon);
 n_instruction* creer_n_boucle_tantque(n_exp* condition, n_l_instructions* instructions);
 n_instruction* creer_n_retour(n_exp* exp);
 n_instruction* creer_n_appelF(char* nom, n_l_exp* arguments);
