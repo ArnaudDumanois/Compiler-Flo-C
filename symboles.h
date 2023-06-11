@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 3.5.1.  */
+/* A Bison parser, made by GNU Bison 3.7.5.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2021 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -31,8 +31,9 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
-/* Undocumented macros, especially those whose name start with YY_,
-   are private implementation details.  Do not rely on them.  */
+/* DO NOT RELY ON FEATURES THAT ARE NOT DOCUMENTED in the manual,
+   especially those whose name start with YY_ or yy_.  They are
+   private implementation details that can be changed or removed.  */
 
 #ifndef YY_YY_SYMBOLES_H_INCLUDED
 # define YY_YY_SYMBOLES_H_INCLUDED
@@ -44,54 +45,58 @@
 extern int yydebug;
 #endif
 
-/* Token type.  */
+/* Token kinds.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
   enum yytokentype
   {
-    FIN = 0,
-    IDENTIFIANT = 258,
-    PARENTHESE_OUVRANTE = 259,
-    PARENTHESE_FERMANTE = 260,
-    POINT_VIRGULE = 261,
-    ENTIER = 262,
-    ECRIRE = 263,
-    AFFECTATION = 264,
-    EGAL = 265,
-    DIFFERENT = 266,
-    INFERIEUR = 267,
-    SUPERIEUR = 268,
-    INFERIEUR_EGAL = 269,
-    SUPERIEUR_EGAL = 270,
-    ACCOLADE_FERMANTE = 271,
-    ACCOLADE_OUVRANTE = 272,
-    VIRGULE = 273,
-    SI = 274,
-    SINON = 275,
-    SINON_SI = 276,
-    LIRE = 277,
-    TANT_QUE = 278,
-    NON = 279,
-    ET = 280,
-    OU = 281,
-    RETOURNER = 282,
-    MOINS = 283,
-    DIVISE = 284,
-    MODULO = 285,
-    FOIS = 286,
-    PLUS = 287,
-    TYPE_ENTIER = 288,
-    TYPE_BOOLEEN = 289,
-    BOOLEEN = 290,
-    UMOINS = 291
+    YYEMPTY = -2,
+    FIN = 0,                       /* FIN  */
+    YYerror = 256,                 /* error  */
+    YYUNDEF = 257,                 /* "invalid token"  */
+    IDENTIFIANT = 258,             /* IDENTIFIANT  */
+    PARENTHESE_OUVRANTE = 259,     /* PARENTHESE_OUVRANTE  */
+    PARENTHESE_FERMANTE = 260,     /* PARENTHESE_FERMANTE  */
+    POINT_VIRGULE = 261,           /* POINT_VIRGULE  */
+    ENTIER = 262,                  /* ENTIER  */
+    ECRIRE = 263,                  /* ECRIRE  */
+    AFFECTATION = 264,             /* AFFECTATION  */
+    EGAL = 265,                    /* EGAL  */
+    DIFFERENT = 266,               /* DIFFERENT  */
+    INFERIEUR = 267,               /* INFERIEUR  */
+    SUPERIEUR = 268,               /* SUPERIEUR  */
+    INFERIEUR_EGAL = 269,          /* INFERIEUR_EGAL  */
+    SUPERIEUR_EGAL = 270,          /* SUPERIEUR_EGAL  */
+    ACCOLADE_FERMANTE = 271,       /* ACCOLADE_FERMANTE  */
+    ACCOLADE_OUVRANTE = 272,       /* ACCOLADE_OUVRANTE  */
+    VIRGULE = 273,                 /* VIRGULE  */
+    SI = 274,                      /* SI  */
+    SINON = 275,                   /* SINON  */
+    SINON_SI = 276,                /* SINON_SI  */
+    LIRE = 277,                    /* LIRE  */
+    TANT_QUE = 278,                /* TANT_QUE  */
+    NON = 279,                     /* NON  */
+    ET = 280,                      /* ET  */
+    OU = 281,                      /* OU  */
+    RETOURNER = 282,               /* RETOURNER  */
+    MOINS = 283,                   /* MOINS  */
+    DIVISE = 284,                  /* DIVISE  */
+    MODULO = 285,                  /* MODULO  */
+    FOIS = 286,                    /* FOIS  */
+    PLUS = 287,                    /* PLUS  */
+    TYPE_ENTIER = 288,             /* TYPE_ENTIER  */
+    TYPE_BOOLEEN = 289,            /* TYPE_BOOLEEN  */
+    BOOLEEN = 290,                 /* BOOLEEN  */
+    UMOINS = 291                   /* UMOINS  */
   };
+  typedef enum yytokentype yytoken_kind_t;
 #endif
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 18 "analyse_syntaxique.y"
+#line 16 "analyse_syntaxique.y"
 
     int entier;
     n_programme* prog;
@@ -106,7 +111,7 @@ union YYSTYPE
     n_l_parametres* l_parametres;
     n_parametre* parametre;
 
-#line 110 "symboles.h"
+#line 115 "symboles.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
